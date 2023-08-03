@@ -19,10 +19,10 @@ public class Application {
 
     public static void main(String @NotNull [] args) {
         logger.info("Welcome to Ingwer Landfill!");
-        //LandfillServer.start();
+        LandfillServer.start();
         System.getProperties();
-        logger.info("Execution: Loggertest");
-        loggerTest(logger);
+        //logger.info("Execution: Loggertest");
+        //loggerTest(logger);
     }
 
     private static void loggerTest(@NotNull Logger logger) {

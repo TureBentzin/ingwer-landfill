@@ -1,9 +1,13 @@
 package de.bentzin.ingwer.landfill.db;
 
+import de.bentzin.ingwer.landfill.db.test.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.util.Assert;
 import org.hibernate.Hibernate;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -36,8 +40,26 @@ public class DatabaseConnector {
             } catch (Exception exception){
                 StandardServiceRegistryBuilder.destroy(serviceRegistry);
                 logger.throwing(exception);
+                return;
             }
 
+            //TEST DO NOT PUSH
+           /*
+            Data data = new Data(0, "Hello, World!");
+
+            try (Session session = sessionFactory.openSession()) {
+                Transaction transaction = session.beginTransaction();
+                session.persist(data);
+                transaction.commit();
+            }
+            */
+
+            try (Session session = sessionFactory.openSession()) {
+                Transaction transaction = session.beginTransaction();
+                Data data0 = session.getReference(Data.class, 0);
+                logger.info(data0 + " from DB");
+                transaction.commit();
+            }
 
         }
     }

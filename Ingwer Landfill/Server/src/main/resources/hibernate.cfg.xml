@@ -26,9 +26,14 @@
             password
         </property>
 
+        <property name= "hibernate.hbm2ddl.auto">update</property>
+        <property name="show_sql">true</property>
+
         <!-- List of XML mapping files
         <mapping resource = "Employee.hbm.xml"/>
         -->
+
+        <mapping class="de.bentzin.ingwer.landfill.db.test.Data"></mapping>
 
     </session-factory>
 </hibernate-configuration>
