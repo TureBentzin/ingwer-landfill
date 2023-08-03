@@ -1,5 +1,6 @@
 package de.bentzin.ingwer.landfill;
 
+import de.bentzin.ingwer.landfill.db.DatabaseConnector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,10 @@ public class LandfillServer implements Runnable {
             throw new IllegalStateException("Landfill seems to have already started in this VM!");
         logger.info("check completed successfully! Proceeding with boot...");
         System.setProperty("landfill.started", "1");
+
+        DatabaseConnector databaseConnector = new DatabaseConnector();
+        databaseConnector.setUp();
+        databaseConnector.connect();
 
     }
 }
