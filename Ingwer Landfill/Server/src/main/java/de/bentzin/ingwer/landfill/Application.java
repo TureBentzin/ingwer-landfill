@@ -16,6 +16,6 @@ public class Application {
     public static void main(String @NotNull [] args) {
         logger.info("Welcome to Ingwer Landfill!");
         LandfillServer.start();
-        System.getProperties()
+        System.getProperties();
     }
 }
