@@ -1,21 +1,20 @@
-package de.bentzin.ingwer.landfill;
+package de.bentzin.ingwer.landfill.properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Entrypoint of Application
  * @author Ture Bentzin
  * @since 2023-08-03
  */
-public class Application {
+public class PropertyUtils {
 
     private static final @NotNull Logger logger = LogManager.getLogger();
 
-    public static void main(String @NotNull [] args) {
-        logger.info("Welcome to Ingwer Landfill!");
-        LandfillServer.start();
-        System.getProperties()
+    public boolean checkForProperty(@NotNull String property) {
+
     }
+
+    private PropertyUtils() {}
 }

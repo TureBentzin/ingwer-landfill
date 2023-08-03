@@ -37,3 +37,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+## Ingwer-Landfill ###
+/Lib/src/main/java/de/bentzin/ingwer/landfill/lib
