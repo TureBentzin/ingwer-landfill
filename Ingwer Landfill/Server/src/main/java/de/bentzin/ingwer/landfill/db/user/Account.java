@@ -1,21 +1,23 @@
-package de.bentzin.ingwer.landfill.db;
+package de.bentzin.ingwer.landfill.db.user;
 
 import de.bentzin.ingwer.landfill.Displayable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Ture Bentzin
  * @since 2023-08-04
  */
 @Entity
-@Table(name = "user")
-public class User implements Displayable {
+@Table(name = "account")
+public class Account implements Displayable {
 
     /**
      * discord id
@@ -23,10 +25,8 @@ public class User implements Displayable {
     @Id
     private long id;
 
-    /**
-     * discord username (new name)
-     */
-    private @NotNull String username;
+    @OneToMany(mappedBy = "account")
+    private List<Usernames> usernames;
 
     /**
      * discord displayname
@@ -41,6 +41,20 @@ public class User implements Displayable {
 
     private @Nullable String aboutMe;
 
+    public Account(long id, List<Usernames> usernames, @NotNull String displayname, @NotNull Date joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe) {
+        this.id = id;
+        this.usernames = usernames;
+        this.displayname = displayname;
+        this.joinDate = joinDate;
+        this.legacyName = legacyName;
+        this.pronouns = pronouns;
+        this.aboutMe = aboutMe;
+    }
+
+    public Account() {
+
+    }
+
     public long getId() {
         return id;
     }
@@ -49,13 +63,6 @@ public class User implements Displayable {
         this.id = id;
     }
 
-    public @NotNull String getUsername() {
-        return username;
-    }
-
-    public void setUsername(@NotNull String username) {
-        this.username = username;
-    }
 
     public @NotNull String getDisplayname() {
         return displayname;
@@ -97,15 +104,4 @@ public class User implements Displayable {
         this.aboutMe = aboutMe;
     }
 
-    @Override
-    public @NotNull String toString() {
-        return "User{" + "id=" + id +
-                ", username='" + username + '\'' +
-                ", displayname='" + displayname + '\'' +
-                ", joinDate=" + joinDate +
-                ", legacyName='" + legacyName + '\'' +
-                ", pronouns='" + pronouns + '\'' +
-                ", aboutMe='" + aboutMe + '\'' +
-                '}';
-    }
 }

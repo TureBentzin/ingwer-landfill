@@ -34,6 +34,8 @@
         -->
 
         <mapping class="de.bentzin.ingwer.landfill.db.test.Data"></mapping>
+        <mapping class="de.bentzin.ingwer.landfill.db.user.Account"></mapping>
+        <mapping class="de.bentzin.ingwer.landfill.db.user.Usernames"></mapping>
 
     </session-factory>
 </hibernate-configuration>

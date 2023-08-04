@@ -43,17 +43,6 @@ public class DatabaseConnector {
                 return;
             }
 
-            //TEST DO NOT PUSH
-           /*
-            Data data = new Data(0, "Hello, World!");
-
-            try (Session session = sessionFactory.openSession()) {
-                Transaction transaction = session.beginTransaction();
-                session.persist(data);
-                transaction.commit();
-            }
-            */
-
             try (Session session = sessionFactory.openSession()) {
                 Transaction transaction = session.beginTransaction();
                 Data data0 = session.getReference(Data.class, 0);

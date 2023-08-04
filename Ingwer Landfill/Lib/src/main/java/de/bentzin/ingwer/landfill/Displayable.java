@@ -1,7 +1,9 @@
 package de.bentzin.ingwer.landfill;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.MessageFactory;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +13,8 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -61,9 +65,9 @@ public interface Displayable {
         StringBuilder tableBuilder = new StringBuilder(System.lineSeparator());
 
         // Calculate maximum column widths
-        AtomicInteger maxNameWidth = new AtomicInteger();
-        AtomicInteger maxTypeWidth = new AtomicInteger();
-        AtomicInteger maxModifiersWidth = new AtomicInteger();
+        AtomicInteger maxNameWidth = new AtomicInteger(1);
+        AtomicInteger maxTypeWidth = new AtomicInteger(1);
+        AtomicInteger maxModifiersWidth = new AtomicInteger(1);
 
         receiveFields().forEach(field -> {
             maxNameWidth.set(Math.max(maxNameWidth.get(), field.getName().length()));
@@ -108,11 +112,15 @@ public interface Displayable {
     }
 
     default void logEmptyLine(@NotNull Level level) {
+        withLogger(logger -> logger.log(level, System.lineSeparator()));
+    }
+
+    default void withLogger(@NotNull Consumer<Logger> action) {
         for (Field field : getClass().getDeclaredFields())
             if (Modifier.isStatic(field.getModifiers()) && field.getType().equals(Logger.class))
                 try {
                     Logger logger = (Logger) field.get(null);
-                    logger.info(System.lineSeparator(), level);
+                    action.accept(logger);
                     return;
                 } catch (Throwable ignored) {
 
@@ -120,7 +128,34 @@ public interface Displayable {
         throw new NoSuchElementException("cant find a logger!");
     }
 
+    default @NotNull Optional<Logger> findLogger() {
+        AtomicReference<Logger> loggerAtomicReference = new AtomicReference<>(null);
+        withLogger(logger -> loggerAtomicReference.set(logger));
+        return Optional.ofNullable(loggerAtomicReference.get());
+    }
+
+    @ApiStatus.Experimental
+    default @NotNull Logger logger(){
+        try {
+            return findLogger().orElseThrow();
+        }catch (Exception e) {
+            return LogManager.getLogger(this);
+        }
+    }
+
     default void logEmptyLine() {
         logEmptyLine(Level.INFO);
+    }
+
+    default void logDynamicBoxedString(@NotNull Logger logger, Level level) {
+        logger.log(level,toDynamicBoxedString());
+    }
+
+    default void logDynamicBoxedString(Logger logger) {
+        logDynamicBoxedString(logger, Level.INFO);
+    }
+
+    default void logDynamicBoxedString() {
+        logDynamicBoxedString(logger()); //May need new logic for performance
     }
 }
