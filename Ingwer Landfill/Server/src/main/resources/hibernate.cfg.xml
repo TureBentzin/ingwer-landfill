@@ -33,11 +33,18 @@
         <mapping resource = "Employee.hbm.xml"/>
         -->
 
+        <!-- Test -->
         <mapping class="de.bentzin.ingwer.landfill.db.test.Data"></mapping>
+
+        <!-- User -->
         <mapping class="de.bentzin.ingwer.landfill.db.user.Account"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.user.Usernames"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.user.badge.BadgeType"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.user.badge.BadgeOwnership"></mapping>
+
+        <!-- Guild -->
+        <mapping class="de.bentzin.ingwer.landfill.db.guild.Guild"></mapping>
+        <mapping class="de.bentzin.ingwer.landfill.db.guild.GuildMembership"></mapping>
 
 
     </session-factory>
