@@ -1,10 +1,7 @@
 package de.bentzin.ingwer.landfill.db.guild;
 
 import de.bentzin.ingwer.landfill.db.user.Account;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -19,9 +16,11 @@ import java.io.Serializable;
 public class GuildMembership {
 
     @Id
+    @ManyToOne
     private @NotNull Account account;
 
     @Id
+    @ManyToOne
     private @NotNull Guild guild;
 
 
