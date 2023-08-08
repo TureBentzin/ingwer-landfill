@@ -7,10 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Ture Bentzin
@@ -30,7 +27,7 @@ class DisplayableTest implements Displayable{
     @Test
     void testReceiveFieldsTest() {
         logger.info("testing for fields...");
-        Assertions.assertArrayEquals(receiveFields().toArray(), this.getClass().getFields());
+        Assertions.assertArrayEquals(fieldsToDisplay().toArray(), this.getClass().getFields());
     }
 
     @Test

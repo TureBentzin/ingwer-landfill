@@ -1,9 +1,9 @@
 package de.bentzin.ingwer.landfill;
 
+import de.bentzin.tools.DoNotOverride;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.MessageFactory;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,9 +12,12 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -23,6 +26,27 @@ import java.util.stream.Stream;
  */
 public interface Displayable {
 
+    static @NotNull Predicate<Field> blacklist(@NotNull Set<Field> blackList) {
+        return field -> !blackList.contains(field);
+    }
+
+    static @NotNull Predicate<Field> blacklist(Field @NotNull [] blacklist) {
+        return blacklist(Arrays.stream(blacklist).collect(Collectors.toUnmodifiableSet()));
+    }
+
+    static @NotNull Predicate<Field> whitelist(Field @NotNull [] whitelist) {
+        return whitelist(Arrays.stream(whitelist).collect(Collectors.toUnmodifiableSet()));
+    }
+
+    static @NotNull Predicate<Field> whitelist(@NotNull Set<Field> whitelist) {
+        return whitelist::contains;
+    }
+
+    static @NotNull Predicate<Field> only(@NotNull Field field) {
+        return field1 -> field1.equals(field1);
+    }
+
+    @DoNotOverride
     default @NotNull String toBoxedString() {
         StringBuilder tableBuilder = new StringBuilder();
 
@@ -34,7 +58,7 @@ public interface Displayable {
         tableBuilder.append("******************************************\n");
 
         // Add rows for each field
-        receiveFields().forEach(field -> {
+        fieldsToDisplay().forEach(field -> {
             String name = field.getName();
             String type = field.getType().getSimpleName();
             String modifiers = Modifier.toString(field.getModifiers());
@@ -61,6 +85,7 @@ public interface Displayable {
 
     //This will need further attention
     @ApiStatus.Experimental
+    @DoNotOverride
     default @NotNull String toDynamicBoxedString() {
         StringBuilder tableBuilder = new StringBuilder(System.lineSeparator());
 
@@ -69,7 +94,7 @@ public interface Displayable {
         AtomicInteger maxTypeWidth = new AtomicInteger(1);
         AtomicInteger maxModifiersWidth = new AtomicInteger(1);
 
-        receiveFields().forEach(field -> {
+        fieldsToDisplay().forEach(field -> {
             maxNameWidth.set(Math.max(maxNameWidth.get(), field.getName().length()));
             maxTypeWidth.set(Math.max(maxTypeWidth.get(), field.getType().getSimpleName().length()));
             maxModifiersWidth.set(Math.max(maxModifiersWidth.get(), Modifier.toString(field.getModifiers()).length()));
@@ -86,7 +111,7 @@ public interface Displayable {
         tableBuilder.append("*".repeat(totalWidth)).append("\n");
 
         // Add rows for each field
-        receiveFields().forEach(field -> {
+        fieldsToDisplay().forEach(field -> {
             String name = field.getName();
             String type = field.getType().getSimpleName();
             String modifiers = Modifier.toString(field.getModifiers());
@@ -107,10 +132,16 @@ public interface Displayable {
         return tableBuilder.toString();
     }
 
-    default @NotNull Stream<Field> receiveFields() {
+    default @NotNull Stream<Field> fieldsToDisplay() {
+        return collectFields();
+    }
+
+
+    default @NotNull Stream<Field> collectFields() {
         return Arrays.stream(this.getClass().getFields());
     }
 
+    @DoNotOverride
     default void logEmptyLine(@NotNull Level level) {
         withLogger(logger -> logger.log(level, System.lineSeparator()));
     }
@@ -130,15 +161,15 @@ public interface Displayable {
 
     default @NotNull Optional<Logger> findLogger() {
         AtomicReference<Logger> loggerAtomicReference = new AtomicReference<>(null);
-        withLogger(logger -> loggerAtomicReference.set(logger));
+        withLogger(loggerAtomicReference::set);
         return Optional.ofNullable(loggerAtomicReference.get());
     }
 
     @ApiStatus.Experimental
-    default @NotNull Logger logger(){
+    default @NotNull Logger logger() {
         try {
             return findLogger().orElseThrow();
-        }catch (Exception e) {
+        } catch (Exception e) {
             return LogManager.getLogger(this);
         }
     }
@@ -147,11 +178,11 @@ public interface Displayable {
         logEmptyLine(Level.INFO);
     }
 
-    default void logDynamicBoxedString(@NotNull Logger logger, Level level) {
-        logger.log(level,toDynamicBoxedString());
+    default void logDynamicBoxedString(@NotNull Logger logger, @NotNull Level level) {
+        logger.log(level, toDynamicBoxedString());
     }
 
-    default void logDynamicBoxedString(Logger logger) {
+    default void logDynamicBoxedString(@NotNull Logger logger) {
         logDynamicBoxedString(logger, Level.INFO);
     }
 
