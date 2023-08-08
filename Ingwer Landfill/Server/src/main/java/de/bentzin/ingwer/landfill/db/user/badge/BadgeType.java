@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Ture Bentzin
  * @since 2023-08-08
  */
-public enum BatchType {
+public enum BadgeType {
 
     LEGACY_USERNAME,
 
@@ -51,7 +51,7 @@ public enum BatchType {
     ACTIVE_DEVELOPER,
 
     VERIFIED_DEVELOPER,
-    
+
     BOT_COMMANDS,
 
     /**
