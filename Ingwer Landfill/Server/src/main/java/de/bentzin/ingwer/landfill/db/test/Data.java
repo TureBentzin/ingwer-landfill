@@ -1,8 +1,7 @@
 package de.bentzin.ingwer.landfill.db.test;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Ture Bentzin
@@ -13,13 +12,21 @@ import jakarta.persistence.Table;
 public class Data {
 
     @Id
+    @GeneratedValue
     private int id;
 
+    @Enumerated(EnumType.STRING)
+    private @NotNull Type type;
 
-    private String data;
+    public void setType(Type type) {
+        this.type = type;
+    }
 
-    public Data(int id, String data) {
+    private @NotNull String data;
+
+    public Data(int id, Type type, String data) {
         this.id = id;
+        this.type = type;
         this.data = data;
     }
 
@@ -44,11 +51,15 @@ public class Data {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         final StringBuffer sb = new StringBuffer("Data{");
         sb.append("id=").append(id);
         sb.append(", data='").append(data).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    public @NotNull Type getType() {
+        return type;
     }
 }

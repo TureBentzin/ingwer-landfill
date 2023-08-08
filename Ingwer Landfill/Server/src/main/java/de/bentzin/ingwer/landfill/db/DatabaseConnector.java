@@ -1,10 +1,9 @@
 package de.bentzin.ingwer.landfill.db;
 
 import de.bentzin.ingwer.landfill.db.test.Data;
+import de.bentzin.ingwer.landfill.db.test.Type;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.util.Assert;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -13,6 +12,8 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * @author Ture Bentzin
@@ -53,7 +54,14 @@ public class DatabaseConnector {
         }
     }
 
-    public void connect() {
-
+    public void test() {
+        try (Session session = Objects.requireNonNull(sessionFactory).openSession()) {
+            Data data = new Data();
+            data.setData("DATA !!!!");
+            data.setType(Type.MR_LORD);
+            var t = session.beginTransaction();
+            session.persist(data);
+            t.commit();
+        }
     }
 }

@@ -2,8 +2,6 @@ package de.bentzin.ingwer.landfill.db;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * @author Ture Bentzin
  * @since 2023-08-03
@@ -19,6 +17,6 @@ class DatabaseConnectorTest {
 
     @Test
     void connect() {
-        databaseConnector.connect();
+        databaseConnector.test();
     }
 }

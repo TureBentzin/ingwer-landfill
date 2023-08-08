@@ -13,7 +13,7 @@ import java.util.Date;
 public class Usernames {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     private long id;
 
     @ManyToOne

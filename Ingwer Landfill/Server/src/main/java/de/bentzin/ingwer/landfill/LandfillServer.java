@@ -31,7 +31,7 @@ public class LandfillServer implements Runnable {
 
         DatabaseConnector databaseConnector = new DatabaseConnector();
         databaseConnector.setUp();
-        databaseConnector.connect();
+        databaseConnector.test();
 
     }
 }
