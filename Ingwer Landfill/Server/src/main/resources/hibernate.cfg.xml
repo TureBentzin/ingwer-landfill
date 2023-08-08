@@ -45,6 +45,7 @@
         <!-- Guild -->
         <mapping class="de.bentzin.ingwer.landfill.db.guild.Guild"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.guild.GuildMembership"></mapping>
+        <mapping class="de.bentzin.ingwer.landfill.db.guild.Boost"></mapping>
 
 
     </session-factory>

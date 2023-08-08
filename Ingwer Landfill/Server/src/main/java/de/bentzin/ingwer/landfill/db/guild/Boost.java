@@ -1,7 +1,6 @@
-package de.bentzin.ingwer.landfill.db.user.badge;
+package de.bentzin.ingwer.landfill.db.guild;
 
 
-import de.bentzin.ingwer.landfill.db.guild.Guild;
 import de.bentzin.ingwer.landfill.db.user.Account;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
@@ -19,11 +18,11 @@ import java.util.Objects;
 @IdClass(Boost.BoostPK.class)
 public class Boost {
 
-    @OneToMany
+    @ManyToOne
     @Id
     private @NotNull Account account;
 
-    @ManyToMany
+    @ManyToOne
     @Id
     private @NotNull Guild guild;
 
