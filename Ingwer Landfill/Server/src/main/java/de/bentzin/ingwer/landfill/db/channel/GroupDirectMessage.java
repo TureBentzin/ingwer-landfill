@@ -20,7 +20,7 @@ public class GroupDirectMessage {
     private @NotNull Channel channel;
 
     @OneToMany
-    private Set<GroupDirectMessageMember> members = new HashSet<>();
+    private @NotNull Set<GroupDirectMessageMember> members = new HashSet<>();
 
     @Lob
     @Basic
