@@ -53,10 +53,8 @@ public class GroupDirectMessageMember {
     }
 
     public static class GroupDirectMessageMemberPK implements Serializable {
-        @Id
-        protected @NotNull GroupDirectMessage groupDirectMessage;
 
-        @Id
+        protected @NotNull GroupDirectMessage groupDirectMessage;
         protected @NotNull Account account;
 
         public GroupDirectMessageMemberPK(@NotNull GroupDirectMessage groupDirectMessage, @NotNull Account account) {

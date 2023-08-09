@@ -49,14 +49,18 @@
 
         <!-- Channel-->
         <mapping class="de.bentzin.ingwer.landfill.db.channel.Channel"></mapping>
-
-        <!--
         <mapping class="de.bentzin.ingwer.landfill.db.channel.DirectMessage"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.channel.DirectMessageMember"></mapping>
-
-        -->
         <mapping class="de.bentzin.ingwer.landfill.db.channel.GroupDirectMessage"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.channel.GroupDirectMessageMember"></mapping>
+        <mapping class="de.bentzin.ingwer.landfill.db.channel.GuildChannel"></mapping>
+
+        <!-- Message -->
+        <mapping class="de.bentzin.ingwer.landfill.db.message.Message"></mapping>
+
+        <!-- References -->
+        <mapping class="de.bentzin.ingwer.landfill.db.cdn.ExternalReference"></mapping>
+        <mapping class="de.bentzin.ingwer.landfill.db.cdn.References"></mapping>
 
 
 

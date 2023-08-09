@@ -10,7 +10,6 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.type.descriptor.java.spi.JdbcTypeRecommendationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,11 +23,11 @@ public class DatabaseConnector {
 
     private static final @NotNull Logger logger = LogManager.getLogger();
 
-    protected @Nullable SessionFactory sessionFactory;
+    protected @Nullable SessionFactory landfillDB;
 
-    public @NotNull SessionFactory getSessionFactory() {
-        if(sessionFactory == null) throw new IllegalStateException("SessionFactory is not available!");
-        return sessionFactory;
+    public @NotNull SessionFactory getLandfillDB() {
+        if(landfillDB == null) throw new IllegalStateException("SessionFactory is not available!");
+        return landfillDB;
     }
 
     public void setUp() {
@@ -39,7 +38,7 @@ public class DatabaseConnector {
             //Access to serviceRegistry
             try {
                 logger.info("creating and updating database for operation...");
-                sessionFactory = new MetadataSources(serviceRegistry).buildMetadata().buildSessionFactory();
+                landfillDB = new MetadataSources(serviceRegistry).buildMetadata().buildSessionFactory();
                 logger.info("database is now up to date!");
             } catch (Exception exception){
                 logger.error("SessionFactory issue.. This needs to be adressed to maintain operational condition for landfill");
@@ -48,7 +47,7 @@ public class DatabaseConnector {
                 return;
             }
 
-            try (Session session = sessionFactory.openSession()) {
+            try (Session session = landfillDB.openSession()) {
                 Transaction transaction = session.beginTransaction();
                 Data data0 = session.getReference(Data.class, 0);
                 logger.info(data0 + " from DB");
@@ -59,7 +58,7 @@ public class DatabaseConnector {
     }
 
     public void test() {
-        try (Session session = Objects.requireNonNull(sessionFactory).openSession()) {
+        try (Session session = Objects.requireNonNull(landfillDB).openSession()) {
             Data data = new Data();
             data.setData("DATA !!!!");
             data.setType(Type.MR_LORD);

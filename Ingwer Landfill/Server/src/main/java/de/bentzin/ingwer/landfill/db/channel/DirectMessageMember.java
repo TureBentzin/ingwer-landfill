@@ -43,10 +43,9 @@ public class DirectMessageMember {
     }
 
     public static class DirectMessageMemberPK implements Serializable {
-        @Id
+
         protected @NotNull DirectMessage directMessage;
 
-        @Id
         protected @NotNull Account account;
 
         public DirectMessageMemberPK(@NotNull DirectMessage directMessage, @NotNull Account account) {
