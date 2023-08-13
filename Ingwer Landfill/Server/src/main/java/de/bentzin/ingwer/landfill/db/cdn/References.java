@@ -1,10 +1,7 @@
 package de.bentzin.ingwer.landfill.db.cdn;
 
 import de.bentzin.ingwer.landfill.db.message.Message;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +12,7 @@ import java.io.Serializable;
  * @since 2023-08-09
  */
 @Entity
+@Table(name = "messageReferences")
 @IdClass(References.ReferencesPK.class)
 public class References {
 

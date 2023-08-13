@@ -28,7 +28,7 @@ public class Message {
     private @NotNull Account sender;
 
     @Column(nullable = false)
-    private @NotNull Date when;
+    private @NotNull Date timestamp;
 
     //Content
     private @NotNull String message;
@@ -57,12 +57,12 @@ public class Message {
         this.sender = sender;
     }
 
-    public @NotNull Date getWhen() {
-        return when;
+    public @NotNull Date getTimestamp() {
+        return timestamp;
     }
 
-    public void setWhen(@NotNull Date when) {
-        this.when = when;
+    public void setTimestamp(@NotNull Date when) {
+        this.timestamp = when;
     }
 
     public @NotNull String getMessage() {
@@ -73,11 +73,11 @@ public class Message {
         this.message = message;
     }
 
-    public Message(long id, @NotNull Channel channel, @NotNull Account sender, @NotNull Date when, @NotNull String message) {
+    public Message(long id, @NotNull Channel channel, @NotNull Account sender, @NotNull Date timestamp, @NotNull String message) {
         this.id = id;
         this.channel = channel;
         this.sender = sender;
-        this.when = when;
+        this.timestamp = timestamp;
         this.message = message;
     }
 
