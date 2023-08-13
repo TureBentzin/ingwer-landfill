@@ -1,6 +1,7 @@
 package de.bentzin.ingwer.landfill.db.user;
 
 import de.bentzin.ingwer.landfill.Displayable;
+import de.bentzin.ingwer.landfill.DisplaynameField;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -31,6 +32,7 @@ public class Account implements Displayable {
     /**
      * discord displayname
      */
+    @DisplaynameField
     private @NotNull String displayname;
 
     private @NotNull Date joinDate;

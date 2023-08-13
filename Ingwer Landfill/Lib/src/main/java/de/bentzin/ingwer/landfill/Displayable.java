@@ -1,5 +1,6 @@
 package de.bentzin.ingwer.landfill;
 
+import de.bentzin.ingwer.landfill.err.AmbiguousAnnotationException;
 import de.bentzin.tools.DoNotOverride;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -61,12 +62,49 @@ public interface Displayable {
         fieldsToDisplay().forEach(field -> {
             String name = field.getName();
             String type = field.getType().getSimpleName();
+
             String modifiers = Modifier.toString(field.getModifiers());
             String value = null; // You can add logic to get the value if needed
-            try {
-                value = Optional.ofNullable(field.get(this)).orElse("null").toString();
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+
+
+
+            {
+                /*{@link DisplaynameField}*/
+                if (Displayable.class.isAssignableFrom(field.getType())) {
+                    field.setAccessible(true);
+                    try {
+                        Displayable target = (Displayable) field.get(this);
+                        value = String
+                                .valueOf(AmbiguousAnnotationException
+                                        .inline(DisplaynameField.class, target
+                                                .collectFields()
+                                                .filter(f -> f.isAnnotationPresent(DisplaynameField.class)))
+                                        .findAny()
+                                        .stream()
+                                        .map(field1 -> {
+                                            try {
+                                                return field1.get(target);
+                                            } catch (IllegalAccessException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        })
+                                        .findFirst()
+                                        .orElseThrow());
+
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    } catch (NoSuchElementException e) {
+                        logger().debug("cant find a displaynameField!");
+                        try {
+                            value = String.valueOf(field.get(this));
+                        } catch (IllegalAccessException illegalAccessException) {
+                            throw new RuntimeException(illegalAccessException);
+                        }
+
+                    }
+
+                }
+
             }
 
             // Append row to the table
@@ -132,6 +170,11 @@ public interface Displayable {
         return tableBuilder.toString();
     }
 
+    /**
+     * Override this method to modify the collected Fields
+     *
+     * @return the fields that should be displayed
+     */
     default @NotNull Stream<Field> fieldsToDisplay() {
         return collectFields();
     }

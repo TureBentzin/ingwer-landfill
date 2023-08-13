@@ -1,6 +1,7 @@
 package de.bentzin.ingwer.landfill.db.guild;
 
 import de.bentzin.ingwer.landfill.Displayable;
+import de.bentzin.ingwer.landfill.DisplaynameField;
 import de.bentzin.ingwer.landfill.db.user.Account;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,7 @@ public class Guild implements Displayable {
     @Id
     private long id;
 
+    @DisplaynameField
     private @NotNull String name;
 
     @Lob

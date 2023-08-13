@@ -1,8 +1,9 @@
 package de.bentzin.ingwer.landfill.db.channel;
 
+import de.bentzin.ingwer.landfill.Displayable;
+import de.bentzin.ingwer.landfill.DisplaynameField;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Ture Bentzin
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @Entity
 @Table
-public class Channel {
+public class Channel implements Displayable {
 
     /*
     Speacial tables for:
@@ -27,8 +28,41 @@ public class Channel {
     private long id;
 
     @Enumerated(EnumType.STRING)
-    private ChannelType type;
+    private @NotNull ChannelType type;
 
-    private String name;
+    @DisplaynameField
+    private @NotNull String name;
 
+    public Channel(@NotNull ChannelType type, @NotNull String name) {
+        this.type = type;
+        this.name = name;
+    }
+
+    public Channel() {
+
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public @NotNull ChannelType getType() {
+        return type;
+    }
+
+    public void setType(@NotNull ChannelType type) {
+        this.type = type;
+    }
+
+    public @NotNull String getName() {
+        return name;
+    }
+
+    public void setName(@NotNull String name) {
+        this.name = name;
+    }
 }

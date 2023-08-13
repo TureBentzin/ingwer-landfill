@@ -2,6 +2,7 @@ package de.bentzin.ingwer.landfill.err;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -19,6 +20,13 @@ import java.util.stream.Stream;
 public class AmbiguousAnnotationException extends RuntimeException {
 
     private static final @NotNull Logger logger = LogManager.getLogger();
+
+    @SuppressWarnings("DataFlowIssue")
+    @ApiStatus.Experimental
+    public static @NotNull Stream<Field> inline(@NotNull Class<? extends Annotation> annotationType, @NotNull Stream<Field> fields) {
+        if(fields.count() > 1) throw new AmbiguousAnnotationException(annotationType, fields);
+        return fields;
+    }
 
     private final @NotNull Class<? extends Annotation> annotationType;
     private final @NotNull Set<Field> annotatedFields;
