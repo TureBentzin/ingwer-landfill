@@ -13,14 +13,21 @@ import io.netty5.channel.socket.SocketChannel;
 import io.netty5.handler.ssl.SslContext;
 import io.netty5.handler.ssl.SslContextBuilder;
 import io.netty5.handler.ssl.util.InsecureTrustManagerFactory;
-import io.netty5.handler.ssl.util.SelfSignedCertificate;
 import io.netty5.util.concurrent.Future;
 import io.netty5.util.concurrent.FutureCompletionStage;
 import org.jetbrains.annotations.NotNull;
 
-import javax.net.ssl.SSLException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.Arrays;
 
 /**
@@ -31,19 +38,18 @@ public class Client {
 
     public static final @NotNull PacketRegistry p = NettyUtils.newPacketRegistry();
 
-    public static void main(String @NotNull [] args) throws InterruptedException, SSLException {
+    public static void main(String @NotNull [] args) throws InterruptedException, IOException, UnrecoverableKeyException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
         System.out.println("Hello world! " + (args.length == 0 ? "" : Arrays.toString(args)));
         Thread.sleep(60);
 
-        SelfSignedCertificate ssc = null;
-        try {
-            ssc = new SelfSignedCertificate();
-        } catch (CertificateException e) {
-            throw new RuntimeException(e);
-        }
+
+        Certificate certificate = CertificateFactory
+                .getInstance("X.509")
+                .generateCertificate(new FileInputStream("C:\\Users\\tureb\\cert-test\\cert.crt"));
+
 
         final SslContext sslCtx = SslContextBuilder.forClient()
-                .keyManager(ssc.certificate(), ssc.privateKey())
+                .keyManager(new File("C:\\Users\\tureb\\cert-test\\cert.crt"), new File("C:\\Users\\tureb\\cert-test\\localhost.key"))
                 .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
 
         MultithreadEventLoopGroup
@@ -63,7 +69,7 @@ public class Client {
                 }).connect();
         FutureCompletionStage<Channel> await = connect.asStage().await();
         Channel channel = await.getNow();
-        if(channel == null) {
+        if (channel == null) {
             System.out.println("cant connect!");
             return;
         }

@@ -2,7 +2,6 @@ package de.bentzin.ingwer.landfill.service;
 
 import de.bentzin.ingwer.landfill.Dummy;
 import de.bentzin.ingwer.landfill.OneWaySwitch;
-import de.bentzin.ingwer.landfill.auth.IngwerTrustManager;
 import de.bentzin.ingwer.landfill.netty.NettyTransport;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
