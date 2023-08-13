@@ -3,6 +3,7 @@ package de.bentzin.ingwer.landfill.client;
 import de.bentzin.ingwer.landfill.netty.NettyTransport;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
+import de.bentzin.ingwer.landfill.netty.packet.KnockKnockPacket;
 import de.bentzin.ingwer.landfill.netty.packet.StringPacket;
 import io.netty5.bootstrap.Bootstrap;
 import io.netty5.channel.Channel;
@@ -76,7 +77,7 @@ public class Client {
 
         logger.info("Connected: "+ channel.id() + "@" + channel.remoteAddress());
 
-        channel.write(new StringPacket("Hello, World!"));
+        channel.write(new KnockKnockPacket(clientConfigManager.getWorkerID())); //KnockKnock
         channel.flush();
 
 

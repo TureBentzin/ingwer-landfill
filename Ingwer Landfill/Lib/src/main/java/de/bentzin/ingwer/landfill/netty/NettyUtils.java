@@ -1,5 +1,8 @@
 package de.bentzin.ingwer.landfill.netty;
 
+import de.bentzin.ingwer.landfill.netty.handler.KnockKnockHandler;
+import de.bentzin.ingwer.landfill.netty.handler.PacketHandler;
+import de.bentzin.ingwer.landfill.netty.packet.KnockKnockPacket;
 import de.bentzin.ingwer.landfill.netty.packet.StringPacket;
 import io.netty5.buffer.Buffer;
 import io.netty5.buffer.BufferUtil;
@@ -36,7 +39,10 @@ public class NettyUtils {
         pipeline.addLast("encoder", new PacketEncoder(registry));
         pipeline.addLast("length-decoder", lengthFieldBasedFrameDecoder());
         pipeline.addLast("decoder", new PacketDecoder(registry));
+
+        pipeline.addLast("knock-knock", new KnockKnockHandler() );
         pipeline.addLast("handler", new PacketHandler());
+
         logger.info("pipeline was initialized for: " + pipeline.channel().remoteAddress());
         //pipeline.addLast(sslCtx.newHandler(ch.bufferAllocator()));
     }
@@ -44,7 +50,8 @@ public class NettyUtils {
     public static @NotNull PacketRegistry newPacketRegistry() {
         PacketRegistry packetRegistry = new PacketRegistry();
         try {
-            packetRegistry.registerPacket(3, StringPacket.class);
+            packetRegistry.registerPacket(0, StringPacket.class);
+            packetRegistry.registerPacket(1, KnockKnockPacket.class);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

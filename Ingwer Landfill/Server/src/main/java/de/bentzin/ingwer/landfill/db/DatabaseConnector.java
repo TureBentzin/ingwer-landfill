@@ -62,14 +62,4 @@ public class DatabaseConnector {
         }
     }
 
-    public void test() {
-        try (Session session = Objects.requireNonNull(landfillDB).openSession()) {
-            Data data = new Data();
-            data.setData("DATA !!!!");
-            data.setType(Type.MR_LORD);
-            var t = session.beginTransaction();
-            session.persist(data);
-            t.commit();
-        }
-    }
 }

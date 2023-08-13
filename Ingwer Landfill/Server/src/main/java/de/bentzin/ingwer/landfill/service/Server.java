@@ -4,6 +4,7 @@ import de.bentzin.ingwer.landfill.Dummy;
 import de.bentzin.ingwer.landfill.OneWaySwitch;
 import de.bentzin.ingwer.landfill.netty.NettyTransport;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
+import de.bentzin.ingwer.landfill.netty.Packet;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
 import io.netty5.bootstrap.ServerBootstrap;
 import io.netty5.channel.Channel;
@@ -18,6 +19,8 @@ import io.netty5.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty5.handler.ssl.util.SelfSignedCertificate;
 import io.netty5.util.concurrent.FutureCompletionStage;
 import io.netty5.util.concurrent.GlobalEventExecutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import io.netty5.handler.ssl.util.FingerprintTrustManagerFactory;
@@ -27,6 +30,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLException;
 import java.net.SocketAddress;
 import java.security.cert.CertificateException;
+import java.util.Map;
 
 /**
  * @author Ture Bentzin
@@ -34,6 +38,7 @@ import java.security.cert.CertificateException;
  */
 public class Server {
 
+    private static final @NotNull Logger logger = LogManager.getLogger();
     public static final @NotNull PacketRegistry PACKET_REGISTRY = NettyUtils.newPacketRegistry();
     private final @NotNull ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     private final @NotNull ServerBootstrap serverBootstrap;
@@ -76,6 +81,10 @@ public class Server {
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childHandler(new ServerInit(sslCtx, PACKET_REGISTRY));
 
+        logger.info("protocol supports the following packets:");
+        for (Map.Entry<Integer, Class<? extends Packet>> integerClassEntry : PACKET_REGISTRY.getPackets().entrySet()) {
+            logger.info( integerClassEntry.getKey() + "  " + integerClassEntry.getValue().getSimpleName());
+        }
 
         return new Server(bootstrap, address, bossGroup , workerGroup);
     }

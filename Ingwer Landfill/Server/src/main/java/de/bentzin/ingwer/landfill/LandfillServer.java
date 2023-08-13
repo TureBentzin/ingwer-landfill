@@ -39,7 +39,6 @@ public class LandfillServer implements Runnable {
 
         DatabaseConnector databaseConnector = new DatabaseConnector();
         databaseConnector.setUp();
-        databaseConnector.test();
 
         //Setup Security (BC - SSL)
         if(Security.getProvider("BC") == null) {

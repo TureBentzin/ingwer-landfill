@@ -28,11 +28,11 @@ public class ClientConfigManager {
             propertyUtils = new PropertyUtils(clientConf);
             Properties properties = new Properties();
             properties.load(new FileInputStream(configFile()));
-            save();
             new PropertyUtils(properties).dumpTable();
             for (Map.Entry<Object, Object> objectObjectEntry : properties.entrySet()) {
                 clientConf.setProperty(objectObjectEntry.getKey().toString(), objectObjectEntry.getValue().toString());
             }
+            save();
             propertyUtils.dumpTable();
         } catch (IOException e) {
             throw new RuntimeException(e);

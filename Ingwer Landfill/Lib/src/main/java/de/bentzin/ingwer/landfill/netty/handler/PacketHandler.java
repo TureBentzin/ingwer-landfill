@@ -1,5 +1,6 @@
-package de.bentzin.ingwer.landfill.netty;
+package de.bentzin.ingwer.landfill.netty.handler;
 
+import de.bentzin.ingwer.landfill.netty.Packet;
 import io.netty5.channel.ChannelHandlerContext;
 import io.netty5.channel.SimpleChannelInboundHandler;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +18,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
     @Override
     protected void messageReceived(@NotNull ChannelHandlerContext ctx, @NotNull Packet msg) throws Exception {
 
-        logger.info("packet inbound: " + ctx.channel().id() + " -> " + msg);
+        logger.info("packet inbound: " + msg.getClass().getSimpleName()+ "#" + ctx.channel().id() + " -> " + msg);
 
     }
 
