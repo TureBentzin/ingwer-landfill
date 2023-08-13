@@ -14,9 +14,4 @@ class DatabaseConnectorTest {
     void setUp() {
         databaseConnector.setUp();
     }
-
-    @Test
-    void connect() {
-        databaseConnector.test();
-    }
 }

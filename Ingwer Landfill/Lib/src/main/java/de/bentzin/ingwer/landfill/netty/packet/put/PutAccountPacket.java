@@ -33,6 +33,17 @@ public class PutAccountPacket extends PutPacket {
 
     }
 
+    public PutAccountPacket( long id, @NotNull String userName, @NotNull String displayName, long joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe) {
+        super(-1, Datatype.ACCOUNT);
+        this.id = id;
+        this.userName = userName;
+        this.displayName = displayName;
+        this.joinDate = joinDate;
+        this.legacyName = legacyName;
+        this.pronouns = pronouns;
+        this.aboutMe = aboutMe;
+    }
+
     @Override
     public void encode(@NotNull Buffer buffer) {
         superEncode(buffer);

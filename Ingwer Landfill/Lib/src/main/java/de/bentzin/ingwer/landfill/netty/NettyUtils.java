@@ -40,9 +40,9 @@ public class NettyUtils {
         pipeline.addLast("encoder", new PacketEncoder(registry));
         pipeline.addLast("length-decoder", lengthFieldBasedFrameDecoder());
         pipeline.addLast("decoder", new PacketDecoder(registry));
-
-        pipeline.addLast("knock-knock", new KnockKnockHandler() );
         pipeline.addLast("handler", new PacketHandler());
+        pipeline.addLast("knock-knock", new KnockKnockHandler() );
+
 
         logger.info("pipeline was initialized for: " + pipeline.channel().remoteAddress());
         //pipeline.addLast(sslCtx.newHandler(ch.bufferAllocator()));

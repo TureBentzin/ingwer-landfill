@@ -31,4 +31,16 @@ public class Usernames {
     public Usernames() {
 
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public Date getFirstRecorded() {
+        return firstRecorded;
+    }
 }

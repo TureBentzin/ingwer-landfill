@@ -106,4 +106,14 @@ public class Account implements Displayable {
         this.aboutMe = aboutMe;
     }
 
+    public List<Usernames> getUsernames() {
+        return usernames;
+    }
+
+    public void currentUsername(@NotNull String username) {
+        if(getUsernames().stream().map(Usernames::getUsername).noneMatch(s -> s.equals(username))) {
+            Usernames usernames = new Usernames(this, username);
+            getUsernames().add(usernames);
+        }
+    }
 }

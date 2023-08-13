@@ -1,5 +1,6 @@
 package de.bentzin.ingwer.landfill.service;
 
+import de.bentzin.ingwer.landfill.handler.put.AccountHandler;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
 import io.netty5.channel.ChannelInitializer;
@@ -37,6 +38,6 @@ public class ServerInit extends ChannelInitializer<SocketChannel> {
     }
 
     public void addServerHandlers(@NotNull ChannelPipeline pipeline) {
-        pipeline.addLast()
+        pipeline.addLast("put_account_handler",  new AccountHandler());
     }
 }

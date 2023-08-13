@@ -6,7 +6,9 @@ import io.netty5.buffer.Buffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 
+import java.util.Date;
 import java.util.function.Supplier;
 
 /**
@@ -29,6 +31,12 @@ public abstract class PutPacket implements Packet {
         jobID = buffer.readInt(); //jobID
         datatype = Datatype.values()[buffer.readInt()]; //datatype
         logger.info("decoded a put-packet: Job: " + jobID + " datatype: " + datatype);
+    }
+
+    @TestOnly
+    public PutPacket(int jobID, Datatype datatype) {
+        this.jobID = jobID; //jobID
+        this.datatype = datatype; //datatype
     }
 
 
