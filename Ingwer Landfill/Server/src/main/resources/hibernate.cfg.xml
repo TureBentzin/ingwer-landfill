@@ -62,6 +62,9 @@
         <mapping class="de.bentzin.ingwer.landfill.db.cdn.ExternalReference"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.cdn.References"></mapping>
 
+        <!-- Reactions / Usercontent -->
+        <mapping class="de.bentzin.ingwer.landfill.db.reactions.Emoji"></mapping>
+        <mapping class="de.bentzin.ingwer.landfill.db.reactions.GuildEmoji"></mapping>
 
 
 
