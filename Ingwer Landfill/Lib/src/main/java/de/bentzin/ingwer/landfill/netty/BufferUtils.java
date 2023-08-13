@@ -2,15 +2,17 @@ package de.bentzin.ingwer.landfill.netty;
 
 import io.netty5.buffer.Buffer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public class BufferUtils {
+public final class BufferUtils {
 
     public static void encodeString(@NotNull Buffer buffer, @NotNull String string) {
         byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
@@ -27,5 +29,23 @@ public class BufferUtils {
         byte[] bytes = new byte[length];
         buffer.readBytes(bytes, 0, length);
         return bytes;
+    }
+
+    public static <T> void encodeNullable(@NotNull Buffer buffer,
+                                          @Nullable T value,
+                                          @NotNull BiConsumer<@NotNull Buffer, @NotNull T> encoder) {
+        if (value == null) {
+            buffer.writeByte((byte) 0);
+        } else {
+            buffer.writeByte((byte) 1);
+            encoder.accept(buffer, value);
+        }
+    }
+
+    public static <T> @Nullable T decodeNullable(@NotNull Buffer buffer, @NotNull Function<@NotNull Buffer, @NotNull T> decoder) {
+        if (buffer.readByte() == 1) {
+            return decoder.apply(buffer);
+        }
+        return null;
     }
 }

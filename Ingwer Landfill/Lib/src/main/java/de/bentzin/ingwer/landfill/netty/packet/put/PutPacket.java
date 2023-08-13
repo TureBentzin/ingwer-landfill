@@ -24,20 +24,17 @@ public abstract class PutPacket implements Packet {
 
     protected final int jobID;
     protected final @NotNull Datatype datatype;
-    protected final int data_length;
 
     public PutPacket(@NotNull Buffer buffer) {
         jobID = buffer.readInt(); //jobID
         datatype = Datatype.values()[buffer.readInt()]; //datatype
-        data_length =  buffer.readInt();
         logger.info("decoded a put-packet: Job: " + jobID + " datatype: " + datatype);
     }
 
 
-    public void superEncode(@NotNull Buffer buffer, @NotNull Supplier<Integer> dataLength) {
+    public void superEncode(@NotNull Buffer buffer) {
         buffer.writeInt(jobID);
         buffer.writeInt(datatype.ordinal());
-        buffer.writeInt(dataLength.get());
     }
 
 

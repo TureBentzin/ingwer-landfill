@@ -15,7 +15,7 @@ import io.netty5.channel.group.DefaultChannelGroup;
 import io.netty5.handler.ssl.ClientAuth;
 import io.netty5.handler.ssl.SslContext;
 import io.netty5.handler.ssl.SslContextBuilder;
-import io.netty5.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty5.handler.ssl.util.FingerprintTrustManagerFactory;
 import io.netty5.handler.ssl.util.SelfSignedCertificate;
 import io.netty5.util.concurrent.FutureCompletionStage;
 import io.netty5.util.concurrent.GlobalEventExecutor;
@@ -23,10 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import io.netty5.handler.ssl.util.FingerprintTrustManagerFactory;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLException;
 import java.net.SocketAddress;
 import java.security.cert.CertificateException;
@@ -38,9 +35,9 @@ import java.util.Map;
  */
 public class Server {
 
-    private static final @NotNull Logger logger = LogManager.getLogger();
     public static final @NotNull PacketRegistry PACKET_REGISTRY = NettyUtils.newPacketRegistry();
-    private final @NotNull ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private static final @NotNull Logger logger = LogManager.getLogger();
+    private final @NotNull ChannelGroup channelGroup;
     private final @NotNull ServerBootstrap serverBootstrap;
     private final @NotNull SocketAddress socketAddress;
     private final @NotNull MultithreadEventLoopGroup bossGroup;
@@ -51,6 +48,17 @@ public class Server {
     private OneWaySwitch wasRun = new OneWaySwitch();
     private Channel channel;
 
+
+    private Server(@NotNull ServerBootstrap serverBootstrap, @NotNull SocketAddress socketAddress,
+                   @NotNull MultithreadEventLoopGroup bossGroup, @NotNull MultithreadEventLoopGroup workerGroup,
+                   @NotNull ChannelGroup channelGroup) {
+        this.serverBootstrap = serverBootstrap;
+
+        this.socketAddress = socketAddress;
+        this.bossGroup = bossGroup;
+        this.workerGroup = workerGroup;
+        this.channelGroup = channelGroup;
+    }
 
     public static @NotNull Server create(@NotNull SocketAddress address) {
         SelfSignedCertificate ssc = null;
@@ -74,23 +82,25 @@ public class Server {
         MultithreadEventLoopGroup bossGroup = NettyTransport.BEST.newMultithreadEventLoopGroup(),
                 workerGroup = NettyTransport.BEST.newMultithreadEventLoopGroup();
 
+        DefaultChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
         ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(bossGroup, workerGroup)
                 .localAddress(2222)
                 .channel(NettyTransport.BEST.serverSocketChannelClazz)
                 .childOption(ChannelOption.TCP_NODELAY, true)
-                .childHandler(new ServerInit(sslCtx, PACKET_REGISTRY));
+                .childHandler(new ServerInit(sslCtx, PACKET_REGISTRY, channels));
 
         logger.info("protocol supports the following packets:");
         for (Map.Entry<Integer, Class<? extends Packet>> integerClassEntry : PACKET_REGISTRY.getPackets().entrySet()) {
-            logger.info( integerClassEntry.getKey() + "  " + integerClassEntry.getValue().getSimpleName());
+            logger.info(integerClassEntry.getKey() + "  " + integerClassEntry.getValue().getSimpleName());
         }
 
-        return new Server(bootstrap, address, bossGroup , workerGroup);
+        return new Server(bootstrap, address, bossGroup, workerGroup, channels);
     }
 
     public void start() {
-        if(wasRun.isFlipped()) {
+        if (wasRun.isFlipped()) {
             throw new IllegalStateException("the server was already run!");
         }
         wasRun.flip();
@@ -106,9 +116,9 @@ public class Server {
     }
 
     public void stop() throws InterruptedException {
-        if(!running) return;
+        if (!running) return;
 
-        if(channel != null) {
+        if (channel != null) {
             FutureCompletionStage<Void> closed = channel.close().asStage().await();
             //logging and stuff
             FutureCompletionStage<Void> workerClose = workerGroup.shutdownGracefully().asStage().await();
@@ -131,14 +141,5 @@ public class Server {
 
     public @NotNull MultithreadEventLoopGroup getWorkerGroup() {
         return workerGroup;
-    }
-
-    private Server(@NotNull ServerBootstrap serverBootstrap, @NotNull SocketAddress socketAddress,
-                   @NotNull MultithreadEventLoopGroup bossGroup, @NotNull MultithreadEventLoopGroup workerGroup) {
-        this.serverBootstrap = serverBootstrap;
-
-        this.socketAddress = socketAddress;
-        this.bossGroup = bossGroup;
-        this.workerGroup = workerGroup;
     }
 }

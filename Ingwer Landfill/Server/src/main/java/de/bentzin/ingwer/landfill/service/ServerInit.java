@@ -3,6 +3,8 @@ package de.bentzin.ingwer.landfill.service;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
 import io.netty5.channel.ChannelInitializer;
+import io.netty5.channel.ChannelPipeline;
+import io.netty5.channel.group.ChannelGroup;
 import io.netty5.channel.socket.SocketChannel;
 import io.netty5.handler.ssl.SslContext;
 import org.jetbrains.annotations.NotNull;
@@ -16,17 +18,25 @@ public class ServerInit extends ChannelInitializer<SocketChannel> {
 
     private final @NotNull SslContext sslCtx;
     private final @NotNull PacketRegistry registry;
+    private final ChannelGroup channelGroup;
 
 
-    public ServerInit(@NotNull SslContext sslCtx, @NotNull PacketRegistry registry) {
+    public ServerInit(@NotNull SslContext sslCtx, @NotNull PacketRegistry registry, @NotNull ChannelGroup channelGroup) {
         this.sslCtx = sslCtx;
         this.registry = registry;
+        this.channelGroup = channelGroup;
     }
 
     @Override
     protected void initChannel(@NotNull SocketChannel ch) throws Exception {
         System.out.println("New Channel: " + ch.remoteAddress());
         ch.pipeline().addLast(sslCtx.newHandler(ch.bufferAllocator()));
+        channelGroup.add(ch);
         NettyUtils.initializePipeline(ch.pipeline(), registry);
+        addServerHandlers(ch.pipeline());
+    }
+
+    public void addServerHandlers(@NotNull ChannelPipeline pipeline) {
+        pipeline.addLast()
     }
 }
