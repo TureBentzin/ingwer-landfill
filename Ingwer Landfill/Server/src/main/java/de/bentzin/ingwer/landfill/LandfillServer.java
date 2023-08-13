@@ -1,9 +1,14 @@
 package de.bentzin.ingwer.landfill;
 
 import de.bentzin.ingwer.landfill.db.DatabaseConnector;
+import de.bentzin.ingwer.landfill.service.Server;
+import io.netty5.util.NettyRuntime;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jetbrains.annotations.NotNull;
+
+import java.security.Security;
 
 /**
  * @author Ture Bentzin
@@ -32,6 +37,17 @@ public class LandfillServer implements Runnable {
         DatabaseConnector databaseConnector = new DatabaseConnector();
         databaseConnector.setUp();
         databaseConnector.test();
+
+        //Setup Security (BC - SSL)
+        if(Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+
+        try {
+            Server.main(new String[0]);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }

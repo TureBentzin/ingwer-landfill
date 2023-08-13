@@ -1,0 +1,54 @@
+package de.bentzin.ingwer.landfill.netty;
+
+import de.bentzin.ingwer.landfill.netty.packet.StringPacket;
+import io.netty5.buffer.Buffer;
+import io.netty5.buffer.BufferUtil;
+import io.netty5.channel.ChannelPipeline;
+import io.netty5.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty5.handler.codec.LengthFieldPrepender;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * @author Ture Bentzin
+ * @since 2023-08-13
+ */
+public class NettyUtils {
+
+    public static final int MAX_PACKET_SIZE = 16384;
+    public static final int lengthFieldLength = 2;
+    // public static int MIN_PACKET_SIZE = 1;
+
+    public static LengthFieldPrepender lengthFieldPrepender() {
+        return new LengthFieldPrepender(lengthFieldLength);
+    }
+
+    public static LengthFieldBasedFrameDecoder lengthFieldBasedFrameDecoder() {
+        return new LengthFieldBasedFrameDecoder(MAX_PACKET_SIZE, 0, lengthFieldLength, 0, 2);
+    }
+
+    public static void initializePipeline(@NotNull ChannelPipeline pipeline, @NotNull PacketRegistry registry) {
+        pipeline.addLast("length-prepender", lengthFieldPrepender());
+        pipeline.addLast("encoder", new PacketEncoder(registry));
+        pipeline.addLast("length-decoder", lengthFieldBasedFrameDecoder());
+        pipeline.addLast("decoder", new PacketDecoder(registry));
+        pipeline.addLast("handler", new PacketHandler());
+        //pipeline.addLast(sslCtx.newHandler(ch.bufferAllocator()));
+    }
+
+    public static @NotNull PacketRegistry newPacketRegistry() {
+        PacketRegistry packetRegistry = new PacketRegistry();
+        try {
+            packetRegistry.registerPacket(3, StringPacket.class);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return packetRegistry;
+    }
+
+    public static void hexdump(Buffer buffer) {
+        StringBuilder builder = new StringBuilder();
+        BufferUtil.appendPrettyHexDump(builder,buffer);
+        System.out.println(builder);
+    }
+
+}

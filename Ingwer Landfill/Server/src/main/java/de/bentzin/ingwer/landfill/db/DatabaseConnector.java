@@ -47,12 +47,17 @@ public class DatabaseConnector {
                 return;
             }
 
+            /*
+
+
             try (Session session = landfillDB.openSession()) {
                 Transaction transaction = session.beginTransaction();
                 Data data0 = session.getReference(Data.class, 0);
                 logger.info(data0 + " from DB");
                 transaction.commit();
             }
+
+             */
 
         }
     }
