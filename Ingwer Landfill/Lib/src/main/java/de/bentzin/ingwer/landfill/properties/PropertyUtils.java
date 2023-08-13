@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 
 import java.util.Hashtable;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -30,6 +29,17 @@ public class PropertyUtils {
         logger.debug("checking for property: " + property);
         return properties.containsKey(property);
     }
+
+    public @NotNull Optional<String> get(@NotNull String property) {
+        logger.debug("getting property: " + property);
+        return Optional.ofNullable(properties.getProperty(property));
+    }
+
+    public @NotNull Optional<String> getOrDef(@NotNull String property, @NotNull String def) {
+        logger.debug("getting property: " + property);
+        return Optional.ofNullable(properties.getProperty(property, def));
+    }
+
 
     public @NotNull Optional<Object> setProperty(@NotNull String key) {
         return Optional.ofNullable(properties.put(key, ""));
