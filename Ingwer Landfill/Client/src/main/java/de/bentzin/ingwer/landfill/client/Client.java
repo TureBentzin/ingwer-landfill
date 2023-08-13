@@ -15,11 +15,11 @@ import io.netty5.handler.ssl.SslContextBuilder;
 import io.netty5.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty5.util.concurrent.Future;
 import io.netty5.util.concurrent.FutureCompletionStage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.KeyStoreException;
@@ -28,7 +28,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.util.Arrays;
 
 /**
  * @author Ture Bentzin
@@ -37,6 +36,7 @@ import java.util.Arrays;
 public class Client {
 
     public static final @NotNull PacketRegistry p = NettyUtils.newPacketRegistry();
+    private static final @NotNull Logger logger = LogManager.getLogger();
 
     public static void main(String @NotNull [] args) throws InterruptedException, IOException, UnrecoverableKeyException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
         ClientConfigManager clientConfigManager = new ClientConfigManager();
@@ -44,11 +44,11 @@ public class Client {
 
         Certificate certificate = CertificateFactory
                 .getInstance("X.509")
-                .generateCertificate(new FileInputStream("C:\\Users\\tureb\\cert-test\\cert.crt"));
+                .generateCertificate(new FileInputStream(clientConfigManager.getCert()));
 
 
         final SslContext sslCtx = SslContextBuilder.forClient()
-                .keyManager(new File("C:\\Users\\tureb\\cert-test\\cert.crt"), new File("C:\\Users\\tureb\\cert-test\\localhost.key"))
+                .keyManager(clientConfigManager.getCert(), clientConfigManager.getPrivateKey())
                 .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
 
         MultithreadEventLoopGroup
@@ -56,13 +56,14 @@ public class Client {
 
         Future<Channel> connect = new Bootstrap()
                 .group(workerLoop)
-                .remoteAddress(new InetSocketAddress("127.0.0.1", 2222))
+                .remoteAddress(new InetSocketAddress(clientConfigManager.getHostname(), clientConfigManager.getPort()))
                 .channel(NettyTransport.BEST.channelClazz)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(@NotNull SocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline().addLast(sslCtx.newHandler(socketChannel.bufferAllocator(), "127.0.0.1", 2222));
+                        socketChannel.pipeline().addLast(sslCtx.newHandler(socketChannel.bufferAllocator(),
+                                clientConfigManager.getHostname(), clientConfigManager.getPort()));
                         NettyUtils.initializePipeline(socketChannel.pipeline(), p);
                     }
                 }).connect();
@@ -72,7 +73,8 @@ public class Client {
             System.out.println("cant connect!");
             return;
         }
-        System.out.println("connected to: " + channel.localAddress());
+
+        logger.info("Connected: "+ channel.id() + "@" + channel.remoteAddress());
 
         channel.write(new StringPacket("Hello, World!"));
         channel.flush();

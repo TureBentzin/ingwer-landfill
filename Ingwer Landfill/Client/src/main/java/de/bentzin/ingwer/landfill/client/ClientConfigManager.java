@@ -5,10 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -24,11 +22,18 @@ public class ClientConfigManager {
     private @NotNull Properties clientConf;
     public ClientConfigManager() {
         try {
-            ensureFile();
             populateDefaults();
+            ensureFile();
             clientConf = (Properties) clientDefaults.clone();
             propertyUtils = new PropertyUtils(clientConf);
-            clientConf.load(new FileInputStream(configFile()));
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(configFile()));
+            save();
+            new PropertyUtils(properties).dumpTable();
+            for (Map.Entry<Object, Object> objectObjectEntry : properties.entrySet()) {
+                clientConf.setProperty(objectObjectEntry.getKey().toString(), objectObjectEntry.getValue().toString());
+                logger.info("override: " + objectObjectEntry.toString());
+            }
             propertyUtils.dumpTable();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -52,10 +57,11 @@ public class ClientConfigManager {
     private void ensureFile() {
         try {
             File file = configFile();
-
             if (file.createNewFile()) {
                 logger.info("Config created: " + file.getName());
+                ((Properties) clientDefaults.clone()).store(new FileOutputStream(configFile()), "Please adjust all values to your preference!");
             }
+            logger.info("config file is ready: " + file.getAbsolutePath());
         } catch (IOException e) {
             logger.error("An error occurred while ensuring persistence of the config: " + e.getMessage());
         }
