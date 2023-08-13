@@ -15,6 +15,8 @@ import io.netty5.channel.socket.ServerSocketChannel;
 import io.netty5.channel.socket.SocketChannel;
 import io.netty5.channel.socket.nio.NioServerSocketChannel;
 import io.netty5.channel.socket.nio.NioSocketChannel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +28,7 @@ import java.util.function.Supplier;
  * @since 2023-08-13
  */
 public enum NettyTransport {
+
 
     KQUEUE(KQueue.isAvailable(), KQueueSocketChannel.class, KQueueServerSocketChannel.class, KQueueHandler::newFactory),
     EPOLL(Epoll.isAvailable(), EpollSocketChannel.class, EpollServerSocketChannel.class, EpollHandler::newFactory),

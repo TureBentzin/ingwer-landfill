@@ -6,6 +6,8 @@ import io.netty5.buffer.BufferUtil;
 import io.netty5.channel.ChannelPipeline;
 import io.netty5.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty5.handler.codec.LengthFieldPrepender;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,6 +15,9 @@ import org.jetbrains.annotations.NotNull;
  * @since 2023-08-13
  */
 public class NettyUtils {
+
+    private static final @NotNull Logger logger = LogManager.getLogger();
+
 
     public static final int MAX_PACKET_SIZE = 16384;
     public static final int lengthFieldLength = 2;
@@ -32,6 +37,7 @@ public class NettyUtils {
         pipeline.addLast("length-decoder", lengthFieldBasedFrameDecoder());
         pipeline.addLast("decoder", new PacketDecoder(registry));
         pipeline.addLast("handler", new PacketHandler());
+        logger.info("pipeline was initialized for: " + pipeline.channel().remoteAddress());
         //pipeline.addLast(sslCtx.newHandler(ch.bufferAllocator()));
     }
 

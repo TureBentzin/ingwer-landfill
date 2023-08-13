@@ -39,9 +39,8 @@ public class Client {
     public static final @NotNull PacketRegistry p = NettyUtils.newPacketRegistry();
 
     public static void main(String @NotNull [] args) throws InterruptedException, IOException, UnrecoverableKeyException, CertificateException, KeyStoreException, NoSuchAlgorithmException {
-        System.out.println("Hello world! " + (args.length == 0 ? "" : Arrays.toString(args)));
-        Thread.sleep(60);
-
+        ClientConfigManager clientConfigManager = new ClientConfigManager();
+        Thread.sleep(60); //security delay
 
         Certificate certificate = CertificateFactory
                 .getInstance("X.509")
