@@ -65,11 +65,7 @@ public enum BadgeType {
 
     EARLY_SUPPORTED,
 
-    PARTNER,
-
-
-
-    ;
+    PARTNER;
 
     public @NotNull String toID() {
         return this.name().toLowerCase();
