@@ -19,7 +19,7 @@ public class ClientConfigManager {
     private static final @NotNull Logger logger = LogManager.getLogger();
     private final @NotNull Properties clientDefaults = new Properties();
     private final @NotNull PropertyUtils propertyUtils;
-    private @NotNull Properties clientConf;
+    private final @NotNull Properties clientConf;
     public ClientConfigManager() {
         try {
             populateDefaults();
@@ -32,7 +32,6 @@ public class ClientConfigManager {
             new PropertyUtils(properties).dumpTable();
             for (Map.Entry<Object, Object> objectObjectEntry : properties.entrySet()) {
                 clientConf.setProperty(objectObjectEntry.getKey().toString(), objectObjectEntry.getValue().toString());
-                logger.info("override: " + objectObjectEntry.toString());
             }
             propertyUtils.dumpTable();
         } catch (IOException e) {
