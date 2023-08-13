@@ -1,5 +1,8 @@
 package de.bentzin.ingwer.landfill.service;
 
+import de.bentzin.ingwer.landfill.Dummy;
+import de.bentzin.ingwer.landfill.OneWaySwitch;
+import de.bentzin.ingwer.landfill.auth.IngwerTrustManager;
 import de.bentzin.ingwer.landfill.netty.NettyTransport;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
@@ -9,17 +12,22 @@ import io.netty5.channel.ChannelOption;
 import io.netty5.channel.MultithreadEventLoopGroup;
 import io.netty5.channel.group.ChannelGroup;
 import io.netty5.channel.group.DefaultChannelGroup;
+import io.netty5.handler.ssl.ClientAuth;
 import io.netty5.handler.ssl.SslContext;
 import io.netty5.handler.ssl.SslContextBuilder;
+import io.netty5.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty5.handler.ssl.util.SelfSignedCertificate;
-import io.netty5.util.concurrent.Future;
 import io.netty5.util.concurrent.FutureCompletionStage;
 import io.netty5.util.concurrent.GlobalEventExecutor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import io.netty5.handler.ssl.util.FingerprintTrustManagerFactory;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLException;
+import java.net.SocketAddress;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
 
 /**
  * @author Ture Bentzin
@@ -27,12 +35,20 @@ import java.util.Arrays;
  */
 public class Server {
 
-    public static final @NotNull PacketRegistry p = NettyUtils.newPacketRegistry();
-    private static final @NotNull ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    public static final @NotNull PacketRegistry PACKET_REGISTRY = NettyUtils.newPacketRegistry();
+    private final @NotNull ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private final @NotNull ServerBootstrap serverBootstrap;
+    private final @NotNull SocketAddress socketAddress;
+    private final @NotNull MultithreadEventLoopGroup bossGroup;
+    private final @NotNull MultithreadEventLoopGroup workerGroup;
 
-    public static void main(String @NotNull [] args) throws InterruptedException {
-        System.out.println("Hello world! " + (args.length == 0? "" : Arrays.toString(args)));
+    private boolean running = false;
 
+    private OneWaySwitch wasRun = new OneWaySwitch();
+    private Channel channel;
+
+
+    public static @NotNull Server create(@NotNull SocketAddress address) {
         SelfSignedCertificate ssc = null;
         try {
             ssc = new SelfSignedCertificate();
@@ -41,25 +57,80 @@ public class Server {
         }
         SslContext sslCtx;
         try {
-
             sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey())
+                    .clientAuth(ClientAuth.REQUIRE)
+                    .trustManager(FingerprintTrustManagerFactory
+                            .builder("SHA-256")
+                            .fingerprints(Dummy.keys()).build())
                     .build();
         } catch (SSLException e) {
             throw new RuntimeException(e);
         }
 
         MultithreadEventLoopGroup bossGroup = NettyTransport.BEST.newMultithreadEventLoopGroup(),
-                workerLoop = NettyTransport.BEST.newMultithreadEventLoopGroup();
+                workerGroup = NettyTransport.BEST.newMultithreadEventLoopGroup();
 
-        Future<Channel> bind = new ServerBootstrap()
-                .group(bossGroup, workerLoop)
+        ServerBootstrap bootstrap = new ServerBootstrap()
+                .group(bossGroup, workerGroup)
                 .localAddress(2222)
                 .channel(NettyTransport.BEST.serverSocketChannelClazz)
                 .childOption(ChannelOption.TCP_NODELAY, true)
-                .childHandler(new ServerInit(sslCtx, p)).bind();
-        FutureCompletionStage<Channel> await = bind.asStage().await();
-        System.out.println("listening at " + await.getNow().localAddress());
+                .childHandler(new ServerInit(sslCtx, PACKET_REGISTRY));
 
 
+        return new Server(bootstrap, address, bossGroup , workerGroup);
+    }
+
+    public void start() {
+        if(wasRun.isFlipped()) {
+            throw new IllegalStateException("the server was already run!");
+        }
+        wasRun.flip();
+
+        try {
+            channel = serverBootstrap.bind().asStage().await().getNow();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("listening at " + channel.localAddress());
+
+        running = true;
+    }
+
+    public void stop() throws InterruptedException {
+        if(!running) return;
+
+        if(channel != null) {
+            FutureCompletionStage<Void> closed = channel.close().asStage().await();
+            //logging and stuff
+            FutureCompletionStage<Void> workerClose = workerGroup.shutdownGracefully().asStage().await();
+            FutureCompletionStage<Void> bossClose = bossGroup.shutdownGracefully().asStage().await();
+
+        }
+    }
+
+    public @Nullable Channel getChannel() {
+        return channel;
+    }
+
+    public @NotNull ChannelGroup getChannelGroup() {
+        return channelGroup;
+    }
+
+    public @NotNull MultithreadEventLoopGroup getBossGroup() {
+        return bossGroup;
+    }
+
+    public @NotNull MultithreadEventLoopGroup getWorkerGroup() {
+        return workerGroup;
+    }
+
+    private Server(@NotNull ServerBootstrap serverBootstrap, @NotNull SocketAddress socketAddress,
+                   @NotNull MultithreadEventLoopGroup bossGroup, @NotNull MultithreadEventLoopGroup workerGroup) {
+        this.serverBootstrap = serverBootstrap;
+
+        this.socketAddress = socketAddress;
+        this.bossGroup = bossGroup;
+        this.workerGroup = workerGroup;
     }
 }

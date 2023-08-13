@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.security.Security;
 
 /**
@@ -43,11 +45,10 @@ public class LandfillServer implements Runnable {
             Security.addProvider(new BouncyCastleProvider());
         }
 
-        try {
-            Server.main(new String[0]);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        Server server = Server.create(new InetSocketAddress("::1", 2222));
+        logger.info("starting netty server...");
+        server.start();
+        logger.info("server started...");
 
     }
 }

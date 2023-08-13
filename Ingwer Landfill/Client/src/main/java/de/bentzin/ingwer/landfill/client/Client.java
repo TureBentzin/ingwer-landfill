@@ -13,12 +13,14 @@ import io.netty5.channel.socket.SocketChannel;
 import io.netty5.handler.ssl.SslContext;
 import io.netty5.handler.ssl.SslContextBuilder;
 import io.netty5.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty5.handler.ssl.util.SelfSignedCertificate;
 import io.netty5.util.concurrent.Future;
 import io.netty5.util.concurrent.FutureCompletionStage;
 import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.SSLException;
 import java.net.InetSocketAddress;
+import java.security.cert.CertificateException;
 import java.util.Arrays;
 
 /**
@@ -33,7 +35,15 @@ public class Client {
         System.out.println("Hello world! " + (args.length == 0 ? "" : Arrays.toString(args)));
         Thread.sleep(60);
 
+        SelfSignedCertificate ssc = null;
+        try {
+            ssc = new SelfSignedCertificate();
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        }
+
         final SslContext sslCtx = SslContextBuilder.forClient()
+                .keyManager(ssc.certificate(), ssc.privateKey())
                 .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
 
         MultithreadEventLoopGroup
@@ -53,6 +63,10 @@ public class Client {
                 }).connect();
         FutureCompletionStage<Channel> await = connect.asStage().await();
         Channel channel = await.getNow();
+        if(channel == null) {
+            System.out.println("cant connect!");
+            return;
+        }
         System.out.println("connected to: " + channel.localAddress());
 
         channel.write(new StringPacket("Hello, World!"));
