@@ -3,6 +3,8 @@ package de.bentzin.ingwer.landfill.netty;
 import io.netty5.buffer.Buffer;
 import io.netty5.channel.ChannelHandlerContext;
 import io.netty5.handler.codec.ByteToMessageDecoder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
@@ -14,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 public class PacketDecoder extends ByteToMessageDecoder {
 
     private final @NotNull PacketRegistry registry;
+    private static final @NotNull Logger logger = LogManager.getLogger();
 
     public PacketDecoder(@NotNull PacketRegistry registry) {
         this.registry = registry;
@@ -21,7 +24,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(@NotNull ChannelHandlerContext channelHandlerContext, @NotNull Buffer buffer) throws Exception {
-        System.out.println("decoding: " + buffer.toString(StandardCharsets.UTF_8));
+        logger.info("decoding: " + buffer.toString(StandardCharsets.UTF_8));
         NettyUtils.hexdump(buffer);
         try(buffer) {
             if(buffer.readableBytes() < 8) return;
@@ -36,6 +39,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     public void channelExceptionCaught(ChannelHandlerContext ctx, @NotNull Throwable cause) throws Exception {
-        System.err.println("fuck: " + ctx.name() + " by " + cause);
+        logger.error("fuck: " + ctx.name() + " by " + cause);
     }
 }

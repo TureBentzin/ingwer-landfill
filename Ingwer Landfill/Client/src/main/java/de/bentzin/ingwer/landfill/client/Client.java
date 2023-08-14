@@ -75,7 +75,7 @@ public class Client {
         FutureCompletionStage<Channel> await = connect.asStage().await();
         Channel channel = await.getNow();
         if (channel == null) {
-            System.out.println("cant connect!");
+            logger.fatal("Cant connect to landfill!");
             return;
         }
 
