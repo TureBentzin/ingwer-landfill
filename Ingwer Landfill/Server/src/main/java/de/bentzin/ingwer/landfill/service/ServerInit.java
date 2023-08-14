@@ -8,6 +8,8 @@ import io.netty5.channel.ChannelPipeline;
 import io.netty5.channel.group.ChannelGroup;
 import io.netty5.channel.socket.SocketChannel;
 import io.netty5.handler.ssl.SslContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -16,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
  * @since 2023-08-13
  */
 public class ServerInit extends ChannelInitializer<SocketChannel> {
+
+    private static final @NotNull Logger logger = LogManager.getLogger();
 
     private final @NotNull SslContext sslCtx;
     private final @NotNull PacketRegistry registry;
@@ -30,7 +34,7 @@ public class ServerInit extends ChannelInitializer<SocketChannel> {
 
     @Override
     protected void initChannel(@NotNull SocketChannel ch) throws Exception {
-        System.out.println("New Channel: " + ch.remoteAddress());
+        logger.info("New Channel: " + ch.remoteAddress() + " " + ch.id().asLongText());
         ch.pipeline().addLast(sslCtx.newHandler(ch.bufferAllocator()));
         channelGroup.add(ch);
         NettyUtils.initializePipeline(ch.pipeline(), registry);

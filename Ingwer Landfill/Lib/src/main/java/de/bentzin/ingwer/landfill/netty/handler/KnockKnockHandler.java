@@ -1,6 +1,5 @@
 package de.bentzin.ingwer.landfill.netty.handler;
 
-import de.bentzin.ingwer.landfill.netty.Packet;
 import de.bentzin.ingwer.landfill.netty.packet.KnockKnockPacket;
 import io.netty5.channel.ChannelHandlerContext;
 import io.netty5.channel.SimpleChannelInboundHandler;
@@ -16,7 +15,7 @@ import java.time.Instant;
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public class KnockKnockHandler extends SimpleChannelInboundHandler<Packet> {
+public class KnockKnockHandler extends SimpleChannelInboundHandler<KnockKnockPacket> {
 
     private static final @NotNull Logger logger = LogManager.getLogger();
 
@@ -26,10 +25,9 @@ public class KnockKnockHandler extends SimpleChannelInboundHandler<Packet> {
     }
 
     @Override
-    protected void messageReceived(@NotNull ChannelHandlerContext ctx, @NotNull Packet msg) throws Exception {
-        if(msg instanceof KnockKnockPacket knockPacket) {
-            String format = SimpleDateFormat.getInstance().format(Date.from(Instant.ofEpochMilli(((KnockKnockPacket) msg).getTime())));
-            logger.info("Client connected to Landfill: \"" + knockPacket.getWorkerID() + "\" @ " + format);
-        }
+    protected void messageReceived(@NotNull ChannelHandlerContext ctx, @NotNull KnockKnockPacket msg) throws Exception {
+            String format = SimpleDateFormat.getDateTimeInstance().format(Date.from(Instant.ofEpochMilli(((KnockKnockPacket) msg).getTime())));
+            logger.info("Client connected to Landfill: \"" + msg.getWorkerID() + "\" @ " + format);
+
     }
 }

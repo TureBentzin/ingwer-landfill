@@ -53,7 +53,7 @@ public interface Displayable {
 
         // Add table header
         tableBuilder.append("******************************************\n");
-        tableBuilder.append(String.format("*  %-38s  *\n", this.getClass().getName() + "#" + this.getClass().hashCode()));
+        tableBuilder.append(String.format("*  %-38s  *\n", this.getClass().getName() + "#" + this.hashCode()));
         tableBuilder.append("******************************************\n");
         tableBuilder.append("*   Name    |   Type   | Modifiers | Value *\n");
         tableBuilder.append("******************************************\n");
@@ -143,13 +143,15 @@ public interface Displayable {
 
         // Add table header
         tableBuilder.append("*".repeat(totalWidth)).append("\n");
-        tableBuilder.append(String.format("*  %-38s  *\n", this.getClass().getName() + "#" + this.getClass().hashCode()));
+        tableBuilder.append(String.format("*  %-38s  *\n", this.getClass().getName() + "#" + this.hashCode()));
         tableBuilder.append("*".repeat(totalWidth)).append("\n");
         tableBuilder.append(String.format("*   %-" + maxNameWidth + "s |   %-" + maxTypeWidth + "s | %-" + maxModifiersWidth + "s | Value *\n", "Name", "Type", "Modifiers"));
         tableBuilder.append("*".repeat(totalWidth)).append("\n");
 
         // Add rows for each field
         fieldsToDisplay().forEach(field -> {
+            field.setAccessible(true);
+
             String name = field.getName();
             String type = field.getType().getSimpleName();
             String modifiers = Modifier.toString(field.getModifiers());
@@ -181,7 +183,7 @@ public interface Displayable {
 
 
     default @NotNull Stream<Field> collectFields() {
-        return Arrays.stream(this.getClass().getFields());
+        return Arrays.stream(this.getClass().getDeclaredFields());
     }
 
     @DoNotOverride

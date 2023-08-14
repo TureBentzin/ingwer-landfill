@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.zip.CRC32;
 
 /**
  * @author Ture Bentzin
@@ -48,4 +49,15 @@ public final class BufferUtils {
         }
         return null;
     }
+
+    public static long calculateChecksum(Buffer buffer) {
+        Buffer read = buffer.copy();
+        byte[] data = new byte[read.readableBytes()];
+        read.readBytes(data, 0, data.length);
+
+        CRC32 crc32 = new CRC32();
+        crc32.update(data);
+        return crc32.getValue();
+    }
+
 }

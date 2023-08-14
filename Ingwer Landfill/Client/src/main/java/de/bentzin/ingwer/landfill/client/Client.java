@@ -7,10 +7,7 @@ import de.bentzin.ingwer.landfill.netty.packet.KnockKnockPacket;
 import de.bentzin.ingwer.landfill.netty.packet.StringPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutAccountPacket;
 import io.netty5.bootstrap.Bootstrap;
-import io.netty5.channel.Channel;
-import io.netty5.channel.ChannelInitializer;
-import io.netty5.channel.ChannelOption;
-import io.netty5.channel.MultithreadEventLoopGroup;
+import io.netty5.channel.*;
 import io.netty5.channel.socket.SocketChannel;
 import io.netty5.handler.ssl.SslContext;
 import io.netty5.handler.ssl.SslContextBuilder;
@@ -67,6 +64,12 @@ public class Client {
                         socketChannel.pipeline().addLast(sslCtx.newHandler(socketChannel.bufferAllocator(),
                                 clientConfigManager.getHostname(), clientConfigManager.getPort()));
                         NettyUtils.initializePipeline(socketChannel.pipeline(), p);
+                        socketChannel.pipeline().addLast(new SimpleChannelInboundHandler<>() {
+                            @Override
+                            protected void messageReceived(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
+                                logger.info("swallowing message: " + msg);
+                            }
+                        });
                     }
                 }).connect();
         FutureCompletionStage<Channel> await = connect.asStage().await();
