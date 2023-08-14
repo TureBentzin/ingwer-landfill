@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @author Ture Bentzin
@@ -27,7 +28,7 @@ class DisplayableTest implements Displayable{
     @Test
     void testReceiveFieldsTest() {
         logger.info("testing for fields...");
-        Assertions.assertArrayEquals(fieldsToDisplay().toArray(), this.getClass().getFields());
+        Assertions.assertArrayEquals(fieldsToDisplay().toArray(), this.getClass().getDeclaredFields());
     }
 
     @Test
@@ -42,6 +43,6 @@ class DisplayableTest implements Displayable{
 
     @Test
     void testLogEmptyLine() {
-        logEmptyLine();
+        Assertions.assertThrows(NoSuchElementException.class, this::logEmptyLine);
     }
 }
