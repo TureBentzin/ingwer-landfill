@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Ture Bentzin
  * @since 2023-08-14
  */
-public abstract sealed class ResponsePacket implements Packet permits PutConfirmResponsePacket {
+public abstract sealed class ResponsePacket implements Packet permits MalformedDataPacket, PutConfirmResponsePacket {
 
     protected final @NotNull ResponseType responseType;
 
@@ -27,6 +27,7 @@ public abstract sealed class ResponsePacket implements Packet permits PutConfirm
 
     public enum ResponseType {
         UNKNOWN(ResponsePacket.class),
+        MALFORMED(MalformedDataPacket.class),
         PUT_CONFIRM(PutConfirmResponsePacket.class);
 
         private @NotNull Class<? extends ResponsePacket> packetClazz;
