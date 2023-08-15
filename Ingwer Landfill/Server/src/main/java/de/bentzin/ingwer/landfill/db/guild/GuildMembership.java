@@ -23,6 +23,13 @@ public class GuildMembership {
     @ManyToOne
     private @NotNull Guild guild;
 
+    public @NotNull Account getAccount() {
+        return account;
+    }
+
+    public @NotNull Guild getGuild() {
+        return guild;
+    }
 
     public static class GuildMembershipPK implements Serializable {
         protected @NotNull Account account;

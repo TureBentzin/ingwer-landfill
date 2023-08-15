@@ -2,6 +2,8 @@ package de.bentzin.ingwer.landfill.db.user;
 
 import de.bentzin.ingwer.landfill.Displayable;
 import de.bentzin.ingwer.landfill.DisplaynameField;
+import de.bentzin.ingwer.landfill.db.guild.Guild;
+import de.bentzin.ingwer.landfill.db.guild.GuildMembership;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -10,8 +12,10 @@ import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Ture Bentzin
@@ -44,7 +48,7 @@ public class Account implements Displayable {
 
     private @Nullable String aboutMe;
 
-    private @NotNull boolean bot;
+    private boolean bot;
 
     public Account(long id, @NotNull List<Username> usernames, @NotNull String displayname, @NotNull Date joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe, @NotNull boolean bot) {
         this.id = id;
@@ -110,7 +114,7 @@ public class Account implements Displayable {
         this.aboutMe = aboutMe;
     }
 
-    public List<Username> getUsernames() {
+    public @NotNull List<Username> getUsernames() {
         return usernames;
     }
 
@@ -128,5 +132,25 @@ public class Account implements Displayable {
 
     public void setBot(boolean bot) {
         this.bot = bot;
+    }
+
+    @SuppressWarnings("NotNullFieldNotInitialized")
+    @OneToMany(mappedBy = "account")
+    private @NotNull Collection<Avatar> avatars;
+
+    public @NotNull Collection<Avatar> getAvatars() {
+        return avatars;
+    }
+
+    @OneToMany(mappedBy = "account")
+    @SuppressWarnings("NotNullFieldNotInitialized")
+    private @NotNull Collection<GuildMembership> guildMemberships;
+
+    public @NotNull Collection<GuildMembership> getGuildMemberships() {
+        return guildMemberships;
+    }
+
+    public @NotNull Collection<Guild> getGuilds() {
+        return guildMemberships.stream().map(GuildMembership::getGuild).collect(Collectors.toUnmodifiableSet());
     }
 }

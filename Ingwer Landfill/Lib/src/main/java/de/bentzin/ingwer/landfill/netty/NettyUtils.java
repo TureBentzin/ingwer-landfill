@@ -5,6 +5,8 @@ import de.bentzin.ingwer.landfill.netty.handler.PacketHandler;
 import de.bentzin.ingwer.landfill.netty.packet.KnockKnockPacket;
 import de.bentzin.ingwer.landfill.netty.packet.StringPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutAccountPacket;
+import de.bentzin.ingwer.landfill.netty.packet.put.PutAvatarPacket;
+import de.bentzin.ingwer.landfill.netty.packet.put.PutGuildPacket;
 import de.bentzin.ingwer.landfill.netty.packet.response.PutConfirmResponsePacket;
 import io.netty5.buffer.Buffer;
 import io.netty5.buffer.BufferUtil;
@@ -56,6 +58,8 @@ public class NettyUtils {
             packetRegistry.registerPacket(1, KnockKnockPacket.class);
             packetRegistry.registerPacket(2, PutAccountPacket.class);
             packetRegistry.registerPacket(3, PutConfirmResponsePacket.class);
+            packetRegistry.registerPacket(4, PutAvatarPacket.class);
+            packetRegistry.registerPacket(5, PutGuildPacket.class);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

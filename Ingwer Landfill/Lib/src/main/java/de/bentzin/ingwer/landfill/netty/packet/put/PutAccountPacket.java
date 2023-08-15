@@ -11,7 +11,7 @@ import static de.bentzin.ingwer.landfill.netty.BufferUtils.*;
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public class PutAccountPacket extends PutPacket {
+public final class PutAccountPacket extends PutPacket {
 
     private final long id;
     private final @NotNull String userName;
@@ -36,7 +36,7 @@ public class PutAccountPacket extends PutPacket {
     }
 
     public PutAccountPacket(long id, @NotNull String userName, @NotNull String displayName, long joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe, boolean bot) {
-        super(-1, Datatype.ACCOUNT);
+        super(-1);
         this.id = id;
         this.userName = userName;
         this.displayName = displayName;

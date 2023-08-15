@@ -1,6 +1,5 @@
 package de.bentzin.ingwer.landfill.netty.packet.put;
 
-import de.bentzin.ingwer.landfill.Displayable;
 import de.bentzin.ingwer.landfill.netty.BufferUtils;
 import de.bentzin.ingwer.landfill.netty.Packet;
 import io.netty5.buffer.Buffer;
@@ -10,8 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.Date;
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * int: jobID (or -1)
@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public abstract class PutPacket implements Packet {
+public sealed abstract class PutPacket implements Packet permits PutAvatarPacket, PutAccountPacket, PutGuildPacket{
 
     protected static final @NotNull Logger logger = LogManager.getLogger();
 
@@ -39,9 +39,15 @@ public abstract class PutPacket implements Packet {
     }
 
     @TestOnly
-    public PutPacket(int jobID, @NotNull Datatype datatype) {
+    private PutPacket(int jobID, @NotNull Datatype datatype) {
         this.jobID = jobID; //jobID
         this.datatype = datatype; //datatype
+    }
+
+    @TestOnly
+    protected PutPacket(int jobID) {
+        this.jobID = jobID; //jobID
+        this.datatype = findDatatype().orElseThrow(() -> new NoSuchElementException(getClass().getSimpleName() + " seems to have no associated Datatype!")); //datatype
     }
 
 
@@ -54,14 +60,45 @@ public abstract class PutPacket implements Packet {
         return checksum;
     }
 
+    public <T extends PutPacket> boolean checksumEquals(@NotNull T t) {
+        return t.checksum == checksum;
+    }
+
+    public boolean checksumEquals(@NotNull Buffer buffer) {
+        return BufferUtils.calculateChecksum(buffer.copy()) == checksum;
+    }
+
+    public boolean checksumEquals(long checksum) {
+        return this.checksum == checksum;
+    }
+
     public @NotNull Datatype getDatatype() {
         return datatype;
     }
 
     public static enum Datatype {
-        ACCOUNT,
+        ACCOUNT(PutAccountPacket.class),
+        GUILD(PutGuildPacket.class),
+        AVATAR(PutAccountPacket.class)
         //...
         ;
+        private @NotNull Class<? extends PutPacket> packetClass;
+
+        Datatype(@NotNull Class<? extends PutPacket> packetClass) {
+            this.packetClass = packetClass;
+        }
+
+        public @NotNull Class<? extends PutPacket> getPacketClass() {
+            return packetClass;
+        }
+
+        public static @NotNull Optional<Datatype> findDatatype(@NotNull Class<? extends PutPacket> packetClass) {
+            return Arrays.stream(values()).filter(datatype1 -> datatype1.getPacketClass() == packetClass).findFirst();
+        }
+    }
+
+    protected @NotNull Optional<Datatype> findDatatype() {
+        return Datatype.findDatatype(getClass());
     }
 
 }

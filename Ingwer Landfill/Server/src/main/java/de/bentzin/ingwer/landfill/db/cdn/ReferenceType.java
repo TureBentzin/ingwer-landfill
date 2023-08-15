@@ -7,5 +7,5 @@ package de.bentzin.ingwer.landfill.db.cdn;
 
 public enum ReferenceType {
 
-    IMAGE, GIF, AUDIO, FILE, MESSAGE_TXT, UNKNOWN
+    IMAGE, AVATAR, GIF, AUDIO, FILE, MESSAGE_TXT, UNKNOWN
 }
