@@ -20,6 +20,7 @@ public class PutAccountPacket extends PutPacket {
     private final @Nullable String legacyName;
     private final @Nullable String pronouns;
     private final @Nullable String aboutMe;
+    private final boolean bot;
 
     public PutAccountPacket(@NotNull Buffer buffer) {
         super(buffer);
@@ -30,10 +31,11 @@ public class PutAccountPacket extends PutPacket {
         legacyName = decodeNullable(buffer, BufferUtils::decodeString);
         pronouns = decodeNullable(buffer, BufferUtils::decodeString);
         aboutMe = decodeNullable(buffer, BufferUtils::decodeString);
+        bot = buffer.readBoolean();
 
     }
 
-    public PutAccountPacket( long id, @NotNull String userName, @NotNull String displayName, long joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe) {
+    public PutAccountPacket(long id, @NotNull String userName, @NotNull String displayName, long joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe, boolean bot) {
         super(-1, Datatype.ACCOUNT);
         this.id = id;
         this.userName = userName;
@@ -42,6 +44,7 @@ public class PutAccountPacket extends PutPacket {
         this.legacyName = legacyName;
         this.pronouns = pronouns;
         this.aboutMe = aboutMe;
+        this.bot = bot;
     }
 
     @Override
@@ -54,6 +57,11 @@ public class PutAccountPacket extends PutPacket {
         encodeNullable(buffer, displayName, BufferUtils::encodeString);
         encodeNullable(buffer, pronouns, BufferUtils::encodeString);
         encodeNullable(buffer, aboutMe, BufferUtils::encodeString);
+        buffer.writeBoolean(bot);
+    }
+
+    public boolean isBot() {
+        return bot;
     }
 
     public long getId() {

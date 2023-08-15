@@ -28,7 +28,7 @@ public class Account implements Displayable {
     private long id;
 
     @OneToMany(mappedBy = "account")
-    private List<Username> usernames;
+    private @NotNull List<Username> usernames;
 
     /**
      * discord displayname
@@ -44,7 +44,9 @@ public class Account implements Displayable {
 
     private @Nullable String aboutMe;
 
-    public Account(long id, List<Username> usernames, @NotNull String displayname, @NotNull Date joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe) {
+    private @NotNull boolean bot;
+
+    public Account(long id, @NotNull List<Username> usernames, @NotNull String displayname, @NotNull Date joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe, @NotNull boolean bot) {
         this.id = id;
         this.usernames = usernames;
         this.displayname = displayname;
@@ -52,6 +54,7 @@ public class Account implements Displayable {
         this.legacyName = legacyName;
         this.pronouns = pronouns;
         this.aboutMe = aboutMe;
+        this.bot = bot;
     }
 
     public Account() {
@@ -117,5 +120,13 @@ public class Account implements Displayable {
             session.persist(usernames);
             getUsernames().add(usernames);
         }
+    }
+
+    public boolean isBot() {
+        return bot;
+    }
+
+    public void setBot(boolean bot) {
+        this.bot = bot;
     }
 }

@@ -2,7 +2,6 @@ package de.bentzin.ingwer.landfill.handler.put;
 
 import de.bentzin.ingwer.landfill.LandfillServer;
 import de.bentzin.ingwer.landfill.db.user.Account;
-import de.bentzin.ingwer.landfill.netty.BufferUtils;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutAccountPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutPacket;
 import de.bentzin.ingwer.landfill.netty.packet.response.PutConfirmResponsePacket;
@@ -57,7 +56,8 @@ public class AccountHandler extends SimpleChannelInboundHandler<PutAccountPacket
                             Date.from(Instant.ofEpochMilli(msg.getJoinDate())),
                             msg.getLegacyName(),
                             msg.getPronouns(),
-                            msg.getAboutMe());
+                            msg.getAboutMe(),
+                            msg.isBot());
                     session.persist(newAccount);
                 });
                 transaction.commit();

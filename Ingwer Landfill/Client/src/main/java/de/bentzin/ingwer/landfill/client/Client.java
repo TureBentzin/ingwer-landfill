@@ -4,7 +4,6 @@ import de.bentzin.ingwer.landfill.netty.NettyTransport;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
 import de.bentzin.ingwer.landfill.netty.packet.KnockKnockPacket;
-import de.bentzin.ingwer.landfill.netty.packet.StringPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutAccountPacket;
 import io.netty5.bootstrap.Bootstrap;
 import io.netty5.channel.*;
@@ -85,7 +84,7 @@ public class Client {
         channel.flush();
 
         //test
-        channel.write(new PutAccountPacket(2103812381242342L, "USERNAME", "DISPLAYNAME", 9812347802134L,"LEGACYNAME#0000", "IT / TI", "I am a Test!"));
+        channel.write(new PutAccountPacket(2103812381242342L, "USERNAME", "DISPLAYNAME", 9812347802134L,"LEGACYNAME#0000", "IT / TI", "I am a Test!", true));
         channel.flush();
 
     }
