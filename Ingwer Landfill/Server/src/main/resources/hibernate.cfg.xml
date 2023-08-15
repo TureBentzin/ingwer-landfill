@@ -40,6 +40,7 @@
         <!-- User -->
         <mapping class="de.bentzin.ingwer.landfill.db.user.Account"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.user.Username"></mapping>
+        <mapping class="de.bentzin.ingwer.landfill.db.user.Displayname"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.user.badge.BadgeType"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.user.badge.BadgeOwnership"></mapping>
         <mapping class="de.bentzin.ingwer.landfill.db.user.Avatar"></mapping>
