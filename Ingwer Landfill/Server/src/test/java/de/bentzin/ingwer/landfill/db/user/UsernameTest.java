@@ -26,7 +26,7 @@ public class UsernameTest {
             account.logDynamicBoxedString();
             session.merge(account);
             account.logDynamicBoxedString();
-            session.persist(new Usernames(account, "bommels05"));
+            session.persist(new Username(account, "bommels05"));
             transaction.commit();
         }
     }

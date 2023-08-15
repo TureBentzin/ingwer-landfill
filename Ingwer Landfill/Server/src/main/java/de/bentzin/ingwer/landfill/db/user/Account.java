@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +28,7 @@ public class Account implements Displayable {
     private long id;
 
     @OneToMany(mappedBy = "account")
-    private List<Usernames> usernames;
+    private List<Username> usernames;
 
     /**
      * discord displayname
@@ -43,7 +44,7 @@ public class Account implements Displayable {
 
     private @Nullable String aboutMe;
 
-    public Account(long id, List<Usernames> usernames, @NotNull String displayname, @NotNull Date joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe) {
+    public Account(long id, List<Username> usernames, @NotNull String displayname, @NotNull Date joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe) {
         this.id = id;
         this.usernames = usernames;
         this.displayname = displayname;
@@ -106,13 +107,14 @@ public class Account implements Displayable {
         this.aboutMe = aboutMe;
     }
 
-    public List<Usernames> getUsernames() {
+    public List<Username> getUsernames() {
         return usernames;
     }
 
-    public void currentUsername(@NotNull String username) {
-        if(getUsernames().stream().map(Usernames::getUsername).noneMatch(s -> s.equals(username))) {
-            Usernames usernames = new Usernames(this, username);
+    public void currentUsername(@NotNull String username, @NotNull Session session) {
+        if(getUsernames().stream().map(Username::getUsername).noneMatch(s -> s.equals(username))) {
+            Username usernames = new Username(this, username);
+            session.persist(usernames);
             getUsernames().add(usernames);
         }
     }

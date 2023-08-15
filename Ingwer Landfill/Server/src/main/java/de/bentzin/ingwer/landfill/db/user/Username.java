@@ -9,8 +9,8 @@ import java.util.Date;
  * @since 2023-08-04
  */
 @Entity
-@Table(name = "usernames")
-public class Usernames {
+@Table(name = "username")
+public class Username {
 
     @Id
     @GeneratedValue
@@ -23,12 +23,12 @@ public class Usernames {
 
     private Date firstRecorded = new Date();
 
-    public Usernames(Account account, String username) {
+    public Username(Account account, String username) {
         this.account = account;
         this.username = username;
     }
 
-    public Usernames() {
+    public Username() {
 
     }
 

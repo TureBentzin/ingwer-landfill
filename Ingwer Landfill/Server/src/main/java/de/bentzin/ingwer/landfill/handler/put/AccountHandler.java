@@ -48,7 +48,7 @@ public class AccountHandler extends SimpleChannelInboundHandler<PutAccountPacket
                     if (msg.getLegacyName() != null) account1.setLegacyName(msg.getLegacyName());
 
                     {
-                        account1.currentUsername(msg.getUserName());
+                        account1.currentUsername(msg.getUserName(), session);
                     }
                 }, () -> {
                     Account newAccount = new Account(msg.getId(),
