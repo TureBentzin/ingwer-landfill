@@ -5,15 +5,17 @@ import io.netty5.buffer.Buffer;
 import io.netty5.buffer.BufferUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * @author Ture Bentzin
  * @since 2023-08-15
  */
 public final class MalformedDataPacket extends ResponsePacket {
 
-    private final @NotNull String execption;
+    private final @NotNull List<de.bentzin.ingwer.landfill.db.user.Displayname> execption;
 
-    public MalformedDataPacket( @NotNull String execption) {
+    public MalformedDataPacket(@NotNull List<de.bentzin.ingwer.landfill.db.user.Displayname> execption) {
         super(ResponseType.MALFORMED);
         this.execption = execption;
     }
