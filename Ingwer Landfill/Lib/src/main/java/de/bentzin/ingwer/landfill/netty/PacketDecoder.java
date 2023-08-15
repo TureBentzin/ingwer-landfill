@@ -1,5 +1,6 @@
 package de.bentzin.ingwer.landfill.netty;
 
+import de.bentzin.ingwer.landfill.netty.packet.response.MalformedDataPacket;
 import io.netty5.buffer.Buffer;
 import io.netty5.channel.ChannelHandlerContext;
 import io.netty5.handler.codec.ByteToMessageDecoder;
@@ -26,6 +27,9 @@ public class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(@NotNull ChannelHandlerContext channelHandlerContext, @NotNull Buffer buffer) throws Exception {
         logger.info("decoding: " + buffer.toString(StandardCharsets.UTF_8));
         NettyUtils.hexdump(buffer);
+        try {
+
+
         try(buffer) {
             if(buffer.readableBytes() < 8) return;
             int length = buffer.readInt();
@@ -33,6 +37,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
             try(final Buffer data = buffer.readSplit(length - 4)) {
                 Packet apply = registry.getConstructors().get(id).apply(data);
                 channelHandlerContext.fireChannelRead(apply);
+            }
+        }
+
+        }catch (RuntimeException runtimeException) {
+            if(runtimeException.getCause() instanceof IndexOutOfBoundsException e){
+                channelHandlerContext.channel().write(new MalformedDataPacket(String.valueOf(e)));
+                channelHandlerContext.channel().flush();
             }
         }
     }
