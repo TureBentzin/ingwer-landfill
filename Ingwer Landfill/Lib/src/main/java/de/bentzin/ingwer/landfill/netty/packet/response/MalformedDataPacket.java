@@ -13,9 +13,9 @@ import java.util.List;
  */
 public final class MalformedDataPacket extends ResponsePacket {
 
-    private final @NotNull List<de.bentzin.ingwer.landfill.db.user.Displayname> execption;
+    private final @NotNull String execption;
 
-    public MalformedDataPacket(@NotNull List<de.bentzin.ingwer.landfill.db.user.Displayname> execption) {
+    public MalformedDataPacket(@NotNull String execption) {
         super(ResponseType.MALFORMED);
         this.execption = execption;
     }

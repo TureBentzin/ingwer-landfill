@@ -48,17 +48,21 @@ public class AccountHandler extends SimpleChannelInboundHandler<PutAccountPacket
 
                     {
                         account1.currentUsername(msg.getUserName(), session);
+                        account1.currentDisplayname(msg.getDisplayName(), session);
                     }
                 }, () -> {
+
                     Account newAccount = new Account(msg.getId(),
                             new ArrayList<>(),
-                            msg.getDisplayName(),
+                            new ArrayList<>(),
                             Date.from(Instant.ofEpochMilli(msg.getJoinDate())),
                             msg.getLegacyName(),
                             msg.getPronouns(),
                             msg.getAboutMe(),
                             msg.isBot());
                     session.persist(newAccount);
+                    newAccount.currentUsername(msg.getUserName(), session);
+                    newAccount.currentDisplayname(msg.getDisplayName(), session);
                 });
                 transaction.commit();
                 session.close();

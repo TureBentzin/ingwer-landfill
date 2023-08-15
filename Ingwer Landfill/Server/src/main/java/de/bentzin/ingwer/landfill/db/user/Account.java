@@ -38,7 +38,8 @@ public class Account implements Displayable {
      * discord displayname
      */
     @DisplaynameField
-    private @NotNull String displayname;
+    @OneToMany(mappedBy = "account")
+    private @NotNull List<Displayname> displaynames;
 
     private @NotNull Date joinDate;
 
@@ -50,10 +51,10 @@ public class Account implements Displayable {
 
     private boolean bot;
 
-    public Account(long id, @NotNull List<Username> usernames, @NotNull String displayname, @NotNull Date joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe, @NotNull boolean bot) {
+    public Account(long id, @NotNull List<Username> usernames, @NotNull List<Displayname> displaynames, @NotNull Date joinDate, @Nullable String legacyName, @Nullable String pronouns, @Nullable String aboutMe, @NotNull boolean bot) {
         this.id = id;
         this.usernames = usernames;
-        this.displayname = displayname;
+        this.displaynames = displaynames;
         this.joinDate = joinDate;
         this.legacyName = legacyName;
         this.pronouns = pronouns;
@@ -74,12 +75,12 @@ public class Account implements Displayable {
     }
 
 
-    public @NotNull String getDisplayname() {
-        return displayname;
+    public @NotNull List<Displayname> getDisplaynames() {
+        return displaynames;
     }
 
-    public void setDisplayname(@NotNull String displayname) {
-        this.displayname = displayname;
+    public void setDisplaynames(@NotNull List<Displayname> displayname) {
+        this.displaynames = displayname;
     }
 
     public @NotNull Date getJoinDate() {
@@ -121,6 +122,14 @@ public class Account implements Displayable {
     public void currentUsername(@NotNull String username, @NotNull Session session) {
         if(getUsernames().stream().map(Username::getUsername).noneMatch(s -> s.equals(username))) {
             Username usernames = new Username(this, username);
+            session.persist(usernames);
+            getUsernames().add(usernames);
+        }
+    }
+
+    public void currentDisplayname(@NotNull String displayname, @NotNull Session session) {
+        if(getDisplaynames().stream().map(Displayname::getDisplayname).noneMatch(s -> s.equals(displayname))) {
+            Username usernames = new Username(this, displayname);
             session.persist(usernames);
             getUsernames().add(usernames);
         }

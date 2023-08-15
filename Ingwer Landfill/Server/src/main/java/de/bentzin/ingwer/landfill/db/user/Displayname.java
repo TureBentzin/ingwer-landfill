@@ -1,6 +1,7 @@
 package de.bentzin.ingwer.landfill.db.user;
 
 import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
@@ -17,30 +18,30 @@ public class Displayname {
     private long id;
 
     @ManyToOne
-    private Account account;
+    private @NotNull Account account;
 
-    private String displayname;
+    private @NotNull String displayname;
 
-    private Date firstRecorded = new Date();
+    private @NotNull Date firstRecorded = new Date();
 
-    public Displayname(Account account, String displayname) {
+    public Displayname(@NotNull Account account, @NotNull String username) {
         this.account = account;
-        this.displayname = displayname;
+        this.displayname = username;
     }
 
     public Displayname() {
 
     }
 
-    public String getDisplayname() {
+    public @NotNull String getDisplayname() {
         return displayname;
     }
 
-    public Account getAccount() {
+    public @NotNull Account getAccount() {
         return account;
     }
 
-    public Date getFirstRecorded() {
+    public @NotNull Date getFirstRecorded() {
         return firstRecorded;
     }
 }
