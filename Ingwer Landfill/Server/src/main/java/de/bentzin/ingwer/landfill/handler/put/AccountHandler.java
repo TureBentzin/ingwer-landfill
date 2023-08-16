@@ -1,12 +1,11 @@
 package de.bentzin.ingwer.landfill.handler.put;
 
-import de.bentzin.ingwer.landfill.LandfillServer;
 import de.bentzin.ingwer.landfill.db.user.Account;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutAccountPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutPacket;
 import de.bentzin.ingwer.landfill.netty.packet.response.PutConfirmResponsePacket;
-import de.bentzin.ingwer.landfill.tasks.QueuedTask;
 import de.bentzin.ingwer.landfill.tasks.Task;
+import de.bentzin.ingwer.landfill.tasks.TaskEnqueuer;
 import de.bentzin.ingwer.landfill.tasks.TaskExecutionException;
 import io.netty5.channel.Channel;
 import io.netty5.channel.ChannelHandlerContext;
@@ -20,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -33,7 +31,6 @@ public class AccountHandler extends SimpleChannelInboundHandler<PutAccountPacket
 
     @Override
     protected void messageReceived(@NotNull ChannelHandlerContext ctx, @NotNull PutAccountPacket msg) throws Exception {
-        logger.info("handling: " + msg);
 
         class PutAccountTask implements Task {
             @Override
@@ -68,15 +65,12 @@ public class AccountHandler extends SimpleChannelInboundHandler<PutAccountPacket
                 session.close();
 
                 //send confirmation
-                channel.write(new PutConfirmResponsePacket(PutPacket.Datatype.ACCOUNT, msg.getChecksum(), 0,true)); //TODO Jobs
+                channel.write(new PutConfirmResponsePacket(PutPacket.Datatype.ACCOUNT, msg.getChecksum(), 0, true)); //TODO Jobs
                 channel.flush();
             }
         }
 
-        Objects.requireNonNull(LandfillServer
-                        .LANDFILL_SERVER
-                        .getTaskmanager())
-                .enqueue(new QueuedTask(new PutAccountTask(), ctx::channel, () -> Objects.requireNonNull(LandfillServer.LANDFILL_SERVER.getDatabaseConnector()).getLandfillDB().openSession()));
+        TaskEnqueuer.enqueueTask(new PutAccountTask(), ctx);
     }
 
 }

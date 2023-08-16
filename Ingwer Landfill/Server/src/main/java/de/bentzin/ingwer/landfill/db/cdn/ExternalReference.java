@@ -24,6 +24,9 @@ public class ExternalReference {
     @Id
     private @NotNull URL reference;
 
+    /**
+     * This is not guaranteed it's just the first occurrence and can be used for data analysis but not for operations
+     */
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private @NotNull ReferenceType referenceType = ReferenceType.UNKNOWN;
