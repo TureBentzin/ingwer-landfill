@@ -38,7 +38,7 @@ public class AccountHandler extends SimpleChannelInboundHandler<PutAccountPacket
                 Optional<Account> account = session.byId(Account.class).loadOptional(msg.getId());
                 Transaction transaction = session.beginTransaction();
                 account.ifPresentOrElse(account1 -> {
-                    account1.logDynamicBoxedString();
+                    //account1.logDynamicBoxedString();
                     if (msg.getAboutMe() != null) account1.setAboutMe(msg.getAboutMe());
                     if (msg.getPronouns() != null) account1.setPronouns(msg.getPronouns());
                     if (msg.getLegacyName() != null) account1.setLegacyName(msg.getLegacyName());
