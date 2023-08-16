@@ -15,6 +15,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 /**
  * @author Ture Bentzin
  * @since 2023-08-16
@@ -30,22 +32,30 @@ public class GuildHandler extends SimpleChannelInboundHandler<PutGuildPacket> {
                 final Transaction transaction = session.beginTransaction();
 
                 //check for the account
-                Account account = session.byId(Account.class).loadOptional(msg.getOwnerID())
-                        .orElseThrow(() -> new TaskExecutionException("account with id: " +  msg.getOwnerID() + " is unknown!"));
+                final Account account = session.byId(Account.class).loadOptional(msg.getOwnerID())
+                        .orElseThrow(() -> new TaskExecutionException("account with id: " + msg.getOwnerID() + " is unknown!"));
 
 
                 //check for ID
-                session.byId(Guild.class).loadOptional(msg.getId())
-                                .orElseGet(() -> {
-                                    //new guild
-                                    Guild guild = new Guild()
-                                })
+                Optional<Guild> guild = session.byId(Guild.class).loadOptional(msg.getId());
 
+                guild.ifPresentOrElse(guild1 -> {
+
+                    //Update
+                    if(msg.getDescription() != null) {guild1.setDescription(msg.getDescription());}
+                    if (msg.getOwnerID() != 0) {guild1.setOwner(account);} //this may fire back
+                    if(msg.getVerificationRequirement() != null) {guild1.setVerificationRequirement(msg.getVerificationRequirement()); }
+                    if(msg.getPremiumTier() != null) {guild1.setPremiumTier(msg.getPremiumTier());}
+                    if(msg.getGuildNSFWLevel() != null) {guild1.setNsfwLevel(msg.getGuildNSFWLevel());}
+                        },
+                        () -> {
+
+                        });
 
                 transaction.commit(); //add the guild
                 session.close();
 
-                channel.write(new PutConfirmResponsePacket(PutPacket.Datatype.GUILD, msg.getChecksum(), 0,true)); //TODO Jobs
+                channel.write(new PutConfirmResponsePacket(PutPacket.Datatype.GUILD, msg.getChecksum(), 0, true)); //TODO Jobs
                 channel.flush();
 
             }
