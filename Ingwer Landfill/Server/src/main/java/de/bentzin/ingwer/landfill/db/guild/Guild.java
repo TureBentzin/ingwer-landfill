@@ -27,10 +27,7 @@ public class Guild implements Displayable {
     @DisplaynameField
     private @NotNull String name;
 
-    @Lob
-    @Basic
-    @Column(name = "logo", columnDefinition = "bytea")
-    private byte @NotNull [] logo;
+    private @Nullable String description;
 
     @ManyToOne
     private @NotNull Account owner;
@@ -47,9 +44,9 @@ public class Guild implements Displayable {
     public Guild() {
     }
 
-    public Guild(@NotNull String name, byte @NotNull [] logo, @NotNull Account owner, @NotNull VerificationRequirement verificationRequirement, @NotNull PremiumTier premiumTier, @NotNull GuildNSFWLevel nsfwLevel) {
+    public Guild(@NotNull String name, @Nullable String description, @NotNull Account owner, @NotNull VerificationRequirement verificationRequirement, @NotNull PremiumTier premiumTier, @NotNull GuildNSFWLevel nsfwLevel) {
         this.name = name;
-        this.logo = logo;
+        this.description = description;
         this.owner = owner;
         this.verificationRequirement = verificationRequirement;
         this.premiumTier = premiumTier;
@@ -70,14 +67,6 @@ public class Guild implements Displayable {
 
     public void setName(@NotNull String name) {
         this.name = name;
-    }
-
-    public byte @NotNull [] getLogo() {
-        return logo;
-    }
-
-    public void setLogo(byte @NotNull [] logo) {
-        this.logo = logo;
     }
 
     public @NotNull Account getOwner() {
@@ -110,5 +99,13 @@ public class Guild implements Displayable {
 
     public void setNsfwLevel(@NotNull GuildNSFWLevel nsfwLevel) {
         this.nsfwLevel = nsfwLevel;
+    }
+
+    public @Nullable String getDescription() {
+        return description;
+    }
+
+    public void setDescription(@Nullable String description) {
+        this.description = description;
     }
 }

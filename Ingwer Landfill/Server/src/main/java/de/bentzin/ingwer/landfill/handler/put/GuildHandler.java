@@ -1,5 +1,7 @@
 package de.bentzin.ingwer.landfill.handler.put;
 
+import de.bentzin.ingwer.landfill.db.guild.Guild;
+import de.bentzin.ingwer.landfill.db.user.Account;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutGuildPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutPacket;
 import de.bentzin.ingwer.landfill.netty.packet.response.PutConfirmResponsePacket;
@@ -27,7 +29,17 @@ public class GuildHandler extends SimpleChannelInboundHandler<PutGuildPacket> {
             public void execute(@NotNull Session session, @NotNull Channel channel) throws TaskExecutionException {
                 final Transaction transaction = session.beginTransaction();
 
-                
+                //check for the account
+                Account account = session.byId(Account.class).loadOptional(msg.getOwnerID())
+                        .orElseThrow(() -> new TaskExecutionException("account with id: " +  msg.getOwnerID() + " is unknown!"));
+
+
+                //check for ID
+                session.byId(Guild.class).loadOptional(msg.getId())
+                                .orElseGet(() -> {
+                                    //new guild
+                                    Guild guild = new Guild()
+                                })
 
 
                 transaction.commit(); //add the guild

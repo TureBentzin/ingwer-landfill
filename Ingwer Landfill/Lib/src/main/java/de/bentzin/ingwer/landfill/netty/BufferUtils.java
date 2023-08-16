@@ -82,6 +82,14 @@ public final class BufferUtils {
         return null;
     }
 
+    public static <T extends Enum<T>> @NotNull T decodeEnum(@NotNull Buffer buffer, @NotNull Class<T> enumClazz) {
+        return enumClazz.getEnumConstants()[buffer.readInt()];
+    }
+
+    public static <T extends Enum<T>> void encodeEnum(@NotNull Buffer buffer, @NotNull T t) {
+        buffer.writeInt(t.ordinal());
+    }
+
     public static long calculateChecksum(Buffer buffer) {
         Buffer read = buffer.copy();
         byte[] data = new byte[read.readableBytes()];
@@ -91,5 +99,6 @@ public final class BufferUtils {
         crc32.update(data);
         return crc32.getValue();
     }
+
 
 }
