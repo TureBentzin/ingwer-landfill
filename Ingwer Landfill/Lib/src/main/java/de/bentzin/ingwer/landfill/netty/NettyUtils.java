@@ -66,10 +66,10 @@ public class NettyUtils {
         return packetRegistry;
     }
 
-    public static void hexdump(Buffer buffer) {
+    public static void hexdump(@NotNull Buffer buffer) {
         StringBuilder builder = new StringBuilder();
         BufferUtil.appendPrettyHexDump(builder, buffer);
-        System.out.println(builder);
+        logger.info(System.lineSeparator() + builder);
     }
 
 }
