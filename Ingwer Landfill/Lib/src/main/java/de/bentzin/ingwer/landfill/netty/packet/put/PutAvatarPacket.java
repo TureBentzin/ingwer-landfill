@@ -35,8 +35,7 @@ public final class PutAvatarPacket extends PutPacket{
     }
 
     @Override
-    public void encode(@NotNull Buffer buffer) {
-        superEncode(buffer);
+    public void encodePut(@NotNull Buffer buffer) {
         buffer.writeLong(account);
         encodeURL(buffer, reference);
     }

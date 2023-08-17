@@ -44,8 +44,7 @@ public final class PutGuildPacket extends PutPacket {
     }
 
     @Override
-    public void encode(@NotNull Buffer buffer) {
-        superEncode(buffer);
+    public void encodePut(@NotNull Buffer buffer) {
         buffer.writeLong(id);
         encodeString(buffer, name);
         encodeString(buffer, description);
@@ -79,7 +78,7 @@ public final class PutGuildPacket extends PutPacket {
         return guildNSFWLevel;
     }
 
-    public String getDescription() {
+    public @NotNull String getDescription() {
         return description;
     }
 }

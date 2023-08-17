@@ -48,8 +48,7 @@ public final class PutAccountPacket extends PutPacket {
     }
 
     @Override
-    public void encode(@NotNull Buffer buffer) {
-        superEncode(buffer);
+    public void encodePut(@NotNull Buffer buffer) {
         buffer.writeLong(id);
         encodeString(buffer, userName);
         encodeString(buffer, displayName);

@@ -18,7 +18,6 @@ public class DirectMessage {
     @OneToOne(optional = true)
     private @NotNull Channel channel;
 
-
     @OneToMany
     private @NotNull Set<DirectMessageMember> members = new HashSet<>();
 

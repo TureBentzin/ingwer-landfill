@@ -2,9 +2,11 @@ package de.bentzin.ingwer.landfill.netty.packet.put;
 
 import de.bentzin.ingwer.landfill.netty.BufferUtils;
 import de.bentzin.ingwer.landfill.netty.Packet;
+import de.bentzin.ingwer.landfill.netty.packet.put.channel.PutChannelPacket;
 import io.netty5.buffer.Buffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
@@ -22,7 +24,7 @@ import java.util.Optional;
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public sealed abstract class PutPacket implements Packet permits PutAvatarPacket, PutAccountPacket, PutGuildPacket{
+public sealed abstract class PutPacket implements Packet permits PutAccountPacket, PutAvatarPacket, PutChannelPacket, PutGuildPacket {
 
     protected static final @NotNull Logger logger = LogManager.getLogger();
 
@@ -51,10 +53,14 @@ public sealed abstract class PutPacket implements Packet permits PutAvatarPacket
     }
 
 
-    public void superEncode(@NotNull Buffer buffer) {
+    public final void encode(@NotNull Buffer buffer) {
         buffer.writeInt(jobID);
         buffer.writeInt(datatype.ordinal());
+        encodePut(buffer);
     }
+
+    @ApiStatus.OverrideOnly
+    protected abstract void encodePut(@NotNull Buffer buffer);
 
     public long getChecksum() {
         return checksum;
