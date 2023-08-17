@@ -3,8 +3,6 @@ package de.bentzin.ingwer.landfill.handler.put;
 import de.bentzin.ingwer.landfill.db.guild.Guild;
 import de.bentzin.ingwer.landfill.db.user.Account;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutGuildPacket;
-import de.bentzin.ingwer.landfill.netty.packet.put.PutPacket;
-import de.bentzin.ingwer.landfill.netty.packet.response.PutConfirmResponsePacket;
 import de.bentzin.ingwer.landfill.tasks.Task;
 import de.bentzin.ingwer.landfill.tasks.TaskEnqueuer;
 import de.bentzin.ingwer.landfill.tasks.TaskExecutionException;
@@ -41,12 +39,22 @@ public class GuildHandler extends SimpleChannelInboundHandler<PutGuildPacket> {
 
                 guild.ifPresentOrElse(guild1 -> {
 
-                    //Update
-                    if(msg.getDescription() != null) {guild1.setDescription(msg.getDescription());}
-                    if (msg.getOwnerID() != 0) {guild1.setOwner(account);} //this may fire back
-                    if(msg.getVerificationRequirement() != null) {guild1.setVerificationRequirement(msg.getVerificationRequirement()); }
-                    if(msg.getPremiumTier() != null) {guild1.setPremiumTier(msg.getPremiumTier());}
-                    if(msg.getGuildNSFWLevel() != null) {guild1.setNsfwLevel(msg.getGuildNSFWLevel());}
+                            //Update
+                            if (msg.getDescription() != null) {
+                                guild1.setDescription(msg.getDescription());
+                            }
+                            if (msg.getOwnerID() != 0) {
+                                guild1.setOwner(account);
+                            } //this may fire back
+                            if (msg.getVerificationRequirement() != null) {
+                                guild1.setVerificationRequirement(msg.getVerificationRequirement());
+                            }
+                            if (msg.getPremiumTier() != null) {
+                                guild1.setPremiumTier(msg.getPremiumTier());
+                            }
+                            if (msg.getGuildNSFWLevel() != null) {
+                                guild1.setNsfwLevel(msg.getGuildNSFWLevel());
+                            }
                         },
                         () -> {
 
@@ -55,7 +63,7 @@ public class GuildHandler extends SimpleChannelInboundHandler<PutGuildPacket> {
                 transaction.commit(); //add the guild
                 session.close();
 
-                channel.write(new PutConfirmResponsePacket(PutPacket.Datatype.GUILD, msg.getChecksum(), 0, true)); //TODO Jobs
+                PutTaskUtils.putConfirm(channel, msg);
                 channel.flush();
 
             }

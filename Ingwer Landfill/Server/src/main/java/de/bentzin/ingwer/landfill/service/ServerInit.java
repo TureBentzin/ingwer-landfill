@@ -1,6 +1,8 @@
 package de.bentzin.ingwer.landfill.service;
 
 import de.bentzin.ingwer.landfill.handler.put.AccountHandler;
+import de.bentzin.ingwer.landfill.handler.put.ChannelHandler;
+import de.bentzin.ingwer.landfill.handler.put.GuildChannelHandler;
 import de.bentzin.ingwer.landfill.handler.put.GuildHandler;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
@@ -45,5 +47,7 @@ public class ServerInit extends ChannelInitializer<SocketChannel> {
     public void addServerHandlers(@NotNull ChannelPipeline pipeline) {
         pipeline.addLast("put_account_handler",  new AccountHandler());
         pipeline.addLast("put_avatar_handler", new GuildHandler());
+        pipeline.addLast("put_channel_handler", new ChannelHandler());
+        pipeline.addLast("put_guild_channel_handler", new GuildChannelHandler());
     }
 }

@@ -33,7 +33,8 @@ public class Channel implements Displayable {
     @DisplaynameField
     private @NotNull String name;
 
-    public Channel(@NotNull ChannelType type, @NotNull String name) {
+    public Channel(long id, @NotNull ChannelType type, @NotNull String name) {
+        this.id = id;
         this.type = type;
         this.name = name;
     }

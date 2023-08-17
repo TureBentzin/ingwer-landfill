@@ -67,7 +67,7 @@ public abstract class TransactionalTask implements Task {
      * @param channel The communication channel for task-specific communication.
      * @throws TaskExecutionException If an error occurs during task execution.
      */
-    public void execute(@NotNull Session session, @NotNull Channel channel) throws TaskExecutionException {
+    public void execute(final @NotNull Session session, final @NotNull Channel channel) throws TaskExecutionException {
         final Transaction transaction = session.beginTransaction();
         try {
             execute(session, channel, transaction);
@@ -92,7 +92,7 @@ public abstract class TransactionalTask implements Task {
      * @param transaction The transaction associated with the task's execution.
      * @throws TaskExecutionException If an error occurs during task execution.
      */
-    protected abstract void execute(@NotNull Session session, @NotNull Channel channel, @NotNull Transaction transaction)
+    protected abstract void execute(final @NotNull Session session, final @NotNull Channel channel, final @NotNull Transaction transaction)
             throws TaskExecutionException;
 }
 

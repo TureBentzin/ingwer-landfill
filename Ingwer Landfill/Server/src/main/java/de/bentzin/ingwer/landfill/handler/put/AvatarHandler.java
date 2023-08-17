@@ -60,7 +60,7 @@ public class AvatarHandler extends SimpleChannelInboundHandler<PutAvatarPacket> 
                 transaction.commit(); //add the avatar
                 session.close();
 
-                channel.write(new PutConfirmResponsePacket(PutPacket.Datatype.AVATAR, msg.getChecksum(), 0,true)); //TODO Jobs
+                PutTaskUtils.putConfirm(channel, msg);
                 channel.flush();
 
             }

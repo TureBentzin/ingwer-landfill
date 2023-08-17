@@ -23,7 +23,7 @@ import java.util.Optional;
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public sealed abstract class PutPacket implements Packet permits PutAccountPacket, PutAvatarPacket, PutChannelPacket, PutGuildPacket {
+public sealed abstract class PutPacket implements Packet permits PutAccountPacket, PutAvatarPacket, PutChannelPacket, PutChanneledPacket, PutGuildPacket {
 
     protected static final @NotNull Logger logger = LogManager.getLogger();
 
@@ -81,10 +81,12 @@ public sealed abstract class PutPacket implements Packet permits PutAccountPacke
         return datatype;
     }
 
-    public static enum Datatype {
+    public enum Datatype {
         ACCOUNT(PutAccountPacket.class),
         GUILD(PutGuildPacket.class),
-        AVATAR(PutAccountPacket.class)
+        AVATAR(PutAccountPacket.class),
+        CHANNEL(PutChanneledPacket.class),
+        GUILD_CHANNEL(PutGuildChannelPacket.class)
         //...
         ;
         private @NotNull Class<? extends PutPacket> packetClass;
@@ -100,6 +102,7 @@ public sealed abstract class PutPacket implements Packet permits PutAccountPacke
         public static @NotNull Optional<Datatype> findDatatype(@NotNull Class<? extends PutPacket> packetClass) {
             return Arrays.stream(values()).filter(datatype1 -> datatype1.getPacketClass() == packetClass).findFirst();
         }
+
     }
 
     protected @NotNull Optional<Datatype> findDatatype() {

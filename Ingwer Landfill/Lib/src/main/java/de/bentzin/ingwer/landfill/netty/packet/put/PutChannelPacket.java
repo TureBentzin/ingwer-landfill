@@ -15,6 +15,19 @@ import static de.bentzin.ingwer.landfill.netty.BufferUtils.*;
 public final class PutChannelPacket extends PutPacket {
 
     private final long id;
+
+    public long getId() {
+        return id;
+    }
+
+    public @NotNull ChannelType getChannelType() {
+        return channelType;
+    }
+
+    public @NotNull String getName() {
+        return name;
+    }
+
     private final @NotNull ChannelType channelType;
     private final @NotNull String name;
 

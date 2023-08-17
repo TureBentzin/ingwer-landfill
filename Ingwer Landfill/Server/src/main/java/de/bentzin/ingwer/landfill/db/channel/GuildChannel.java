@@ -1,7 +1,9 @@
 package de.bentzin.ingwer.landfill.db.channel;
 
+import de.bentzin.ingwer.landfill.db.guild.Guild;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,13 +15,17 @@ import org.jetbrains.annotations.NotNull;
 public class GuildChannel {
 
     @Id
-    @OneToOne(optional = true)
+    @OneToOne(optional = false)
     private @NotNull Channel channel;
+
+    @ManyToOne(optional = false)
+    private @NotNull Guild guild;
 
     private @NotNull String topic;
 
-    public GuildChannel(@NotNull Channel channel, @NotNull String topic) {
+    public GuildChannel(@NotNull Channel channel, @NotNull Guild guild, @NotNull String topic) {
         this.channel = channel;
+        this.guild = guild;
         this.topic = topic;
     }
 
@@ -42,5 +48,7 @@ public class GuildChannel {
         this.topic = topic;
     }
 
-
+    public @NotNull Guild getGuild() {
+        return guild;
+    }
 }

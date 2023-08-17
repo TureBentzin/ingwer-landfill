@@ -65,7 +65,7 @@ public class AccountHandler extends SimpleChannelInboundHandler<PutAccountPacket
                 session.close();
 
                 //send confirmation
-                channel.write(new PutConfirmResponsePacket(PutPacket.Datatype.ACCOUNT, msg.getChecksum(), 0, true)); //TODO Jobs
+                PutTaskUtils.putConfirm(channel, msg);
                 channel.flush();
             }
         }
