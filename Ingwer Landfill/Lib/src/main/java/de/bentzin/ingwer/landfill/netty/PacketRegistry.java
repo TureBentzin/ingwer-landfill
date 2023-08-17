@@ -1,6 +1,8 @@
 package de.bentzin.ingwer.landfill.netty;
 
+import de.bentzin.tools.Independent;
 import io.netty5.buffer.Buffer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
@@ -35,6 +37,22 @@ public class PacketRegistry {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    @ApiStatus.Experimental
+    public void registerPacketSmart(@NotNull Class<? extends Packet> packetClass) throws NoSuchMethodException, IllegalAccessException {
+        registerPacket(getNextIDKey(), packetClass);
+    }
+
+    @ApiStatus.Internal
+    protected int getNextIDKey() {
+        int maxKey = Integer.MIN_VALUE;
+        for (Integer key : constructors.keySet()) {
+            if (key > maxKey) {
+                maxKey = key;
+            }
+        }
+        return maxKey + 1;
     }
 
     public @NotNull HashMap<Class<? extends Packet>, Integer> getReversedPackets() {

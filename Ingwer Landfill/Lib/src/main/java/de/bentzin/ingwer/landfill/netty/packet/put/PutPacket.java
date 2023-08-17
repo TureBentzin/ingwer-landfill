@@ -2,7 +2,6 @@ package de.bentzin.ingwer.landfill.netty.packet.put;
 
 import de.bentzin.ingwer.landfill.netty.BufferUtils;
 import de.bentzin.ingwer.landfill.netty.Packet;
-import de.bentzin.ingwer.landfill.netty.packet.put.channel.PutChannelPacket;
 import io.netty5.buffer.Buffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

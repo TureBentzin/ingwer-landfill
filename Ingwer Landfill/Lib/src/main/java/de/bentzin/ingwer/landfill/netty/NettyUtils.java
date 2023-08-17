@@ -6,6 +6,7 @@ import de.bentzin.ingwer.landfill.netty.packet.KnockKnockPacket;
 import de.bentzin.ingwer.landfill.netty.packet.StringPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutAccountPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutAvatarPacket;
+import de.bentzin.ingwer.landfill.netty.packet.put.PutChannelPacket;
 import de.bentzin.ingwer.landfill.netty.packet.put.PutGuildPacket;
 import de.bentzin.ingwer.landfill.netty.packet.response.MalformedDataPacket;
 import de.bentzin.ingwer.landfill.netty.packet.response.PutConfirmResponsePacket;
@@ -24,11 +25,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class NettyUtils {
 
-    private static final @NotNull Logger logger = LogManager.getLogger();
-
-
     public static final int MAX_PACKET_SIZE = 16384;
     public static final int lengthFieldLength = 2;
+    private static final @NotNull Logger logger = LogManager.getLogger();
     // public static int MIN_PACKET_SIZE = 1;
 
     public static LengthFieldPrepender lengthFieldPrepender() {
@@ -45,7 +44,7 @@ public class NettyUtils {
         pipeline.addLast("length-decoder", lengthFieldBasedFrameDecoder());
         pipeline.addLast("decoder", new PacketDecoder(registry));
         pipeline.addLast("handler", new PacketHandler());
-        pipeline.addLast("knock-knock", new KnockKnockHandler() );
+        pipeline.addLast("knock-knock", new KnockKnockHandler());
 
 
         logger.info("pipeline was initialized for: " + pipeline.channel().remoteAddress());
@@ -55,13 +54,14 @@ public class NettyUtils {
     public static @NotNull PacketRegistry newPacketRegistry() {
         PacketRegistry packetRegistry = new PacketRegistry();
         try {
-            packetRegistry.registerPacket(0, StringPacket.class);
-            packetRegistry.registerPacket(1, KnockKnockPacket.class);
-            packetRegistry.registerPacket(2, PutAccountPacket.class);
-            packetRegistry.registerPacket(3, PutConfirmResponsePacket.class);
-            packetRegistry.registerPacket(4, PutAvatarPacket.class);
-            packetRegistry.registerPacket(5, PutGuildPacket.class);
-            packetRegistry.registerPacket(6, MalformedDataPacket.class);
+            packetRegistry.registerPacketSmart(StringPacket.class);
+            packetRegistry.registerPacketSmart(KnockKnockPacket.class);
+            packetRegistry.registerPacketSmart(PutAccountPacket.class);
+            packetRegistry.registerPacketSmart(PutConfirmResponsePacket.class);
+            packetRegistry.registerPacketSmart(PutAvatarPacket.class);
+            packetRegistry.registerPacketSmart(PutGuildPacket.class);
+            packetRegistry.registerPacketSmart(MalformedDataPacket.class);
+            packetRegistry.registerPacketSmart(PutChannelPacket.class);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -70,7 +70,7 @@ public class NettyUtils {
 
     public static void hexdump(Buffer buffer) {
         StringBuilder builder = new StringBuilder();
-        BufferUtil.appendPrettyHexDump(builder,buffer);
+        BufferUtil.appendPrettyHexDump(builder, buffer);
         System.out.println(builder);
     }
 
