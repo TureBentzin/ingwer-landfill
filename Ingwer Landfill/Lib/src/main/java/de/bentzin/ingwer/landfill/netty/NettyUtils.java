@@ -60,6 +60,7 @@ public class NettyUtils {
             packetRegistry.registerPacketSmart(MalformedDataPacket.class);
             packetRegistry.registerPacketSmart(PutChannelPacket.class);
             packetRegistry.registerPacketSmart(PutGuildChannelPacket.class);
+            packetRegistry.registerPacketSmart(PutGuildMembershipPacket.class);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

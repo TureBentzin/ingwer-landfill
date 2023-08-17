@@ -46,7 +46,7 @@ public class PacketRegistry {
 
     @ApiStatus.Internal
     protected int getNextIDKey() {
-        int maxKey = Integer.MIN_VALUE;
+        int maxKey = -1;
         for (Integer key : constructors.keySet()) {
             if (key > maxKey) {
                 maxKey = key;

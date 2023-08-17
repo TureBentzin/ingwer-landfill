@@ -10,13 +10,13 @@ import org.junit.Test;
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public class TaskmanagerTest {
+public class TaskManagerTest {
 
-    private Taskmanager taskmanager = null;
+    private TaskManager taskmanager = null;
 
     @Before
     public void initializeTaskManagerTest() {
-        taskmanager = new Taskmanager();
+        taskmanager = new TaskManager();
     }
 
 //Needs some attention before pr

@@ -23,6 +23,15 @@ public class GuildMembership {
     @ManyToOne
     private @NotNull Guild guild;
 
+    public GuildMembership(@NotNull Account account, @NotNull Guild guild) {
+        this.account = account;
+        this.guild = guild;
+    }
+
+    public GuildMembership() {
+
+    }
+
     public @NotNull Account getAccount() {
         return account;
     }

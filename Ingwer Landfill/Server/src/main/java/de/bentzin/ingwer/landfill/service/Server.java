@@ -45,8 +45,8 @@ public class Server {
 
     private boolean running = false;
 
-    private OneWaySwitch wasRun = new OneWaySwitch();
-    private Channel channel;
+    private @NotNull OneWaySwitch wasRun = new OneWaySwitch();
+    private @NotNull Channel channel;
 
 
     private Server(@NotNull ServerBootstrap serverBootstrap, @NotNull SocketAddress socketAddress,
@@ -119,11 +119,14 @@ public class Server {
         if (!running) return;
 
         if (channel != null) {
+            logger.info("closing channel: " + channel.localAddress());
             FutureCompletionStage<Void> closed = channel.close().asStage().await();
             //logging and stuff
+            logger.info("shutting down workers");
             FutureCompletionStage<Void> workerClose = workerGroup.shutdownGracefully().asStage().await();
+            logger.info("shutting down bosses");
             FutureCompletionStage<Void> bossClose = bossGroup.shutdownGracefully().asStage().await();
-
+            logger.info("Netty is down!");
         }
     }
 

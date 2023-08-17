@@ -23,7 +23,7 @@ import java.util.Optional;
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public sealed abstract class PutPacket implements Packet permits PutAccountPacket, PutAvatarPacket, PutChannelPacket, PutChanneledPacket, PutGuildPacket {
+public sealed abstract class PutPacket implements Packet permits PutAccountPacket, PutAvatarPacket, PutChannelPacket, PutChanneledPacket, PutGuildMembershipPacket, PutGuildPacket {
 
     protected static final @NotNull Logger logger = LogManager.getLogger();
 

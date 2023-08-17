@@ -14,9 +14,19 @@ import java.util.Optional;
  */
 public class TaskExecutor implements Runnable, Displayable {
 
+    private final int STANDBY_DELAY;
+    private final int LOOP_DELAY;
     private static final @NotNull Logger logger = LogManager.getLogger();
 
-    protected TaskExecutor(@NotNull Taskmanager taskmanager) {
+    protected TaskExecutor(@NotNull TaskManager taskmanager) {
+        this.taskmanager = taskmanager;
+        this.STANDBY_DELAY = TaskManager.STANDBY_DELAY;
+        this.LOOP_DELAY = TaskManager.LOOP_DELAY;
+    }
+
+    protected TaskExecutor(int standbyDelay, int loopDelay, @NotNull TaskManager taskmanager) {
+        STANDBY_DELAY = standbyDelay;
+        LOOP_DELAY = loopDelay;
         this.taskmanager = taskmanager;
     }
 
@@ -27,7 +37,7 @@ public class TaskExecutor implements Runnable, Displayable {
             Optional<QueuedTask> optionalQueuedTask = taskmanager.acceptTask();
             if(optionalQueuedTask.isEmpty()) {
                 try {
-                    Thread.sleep(Taskmanager.STANDBY_DELAY);
+                    Thread.sleep(TaskManager.STANDBY_DELAY);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -43,7 +53,7 @@ public class TaskExecutor implements Runnable, Displayable {
     }
 
     private final @NotNull OneWaySwitch killSwitch = new OneWaySwitch();
-    private final @NotNull Taskmanager taskmanager;
+    private final @NotNull TaskManager taskmanager;
 
 
     public void kill() {

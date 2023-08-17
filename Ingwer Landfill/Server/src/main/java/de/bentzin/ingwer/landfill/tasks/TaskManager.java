@@ -2,10 +2,11 @@ package de.bentzin.ingwer.landfill.tasks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -13,9 +14,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Ture Bentzin
  * @since 2023-08-13
  */
-public final class Taskmanager implements Closeable {
+public final class TaskManager implements Closeable {
 
     public static final int STANDBY_DELAY = 2000;
+    public static final int LOOP_DELAY = 100; //Debug delay - set 0 for pr
     private static final int EXECUTOR_AMOUNT = 1;
 
     private static final @NotNull Logger logger = LogManager.getLogger();
@@ -24,7 +26,7 @@ public final class Taskmanager implements Closeable {
     private final @NotNull Set<TaskExecutor> executors = new HashSet<>();
     private final @NotNull ThreadGroup executorGroup;
 
-    public Taskmanager(@NotNull Queue<QueuedTask> taskQueue) {
+    public TaskManager(@NotNull Queue<QueuedTask> taskQueue) {
         this.taskQueue = taskQueue;
 
         //create Executors
@@ -39,11 +41,12 @@ public final class Taskmanager implements Closeable {
     }
 
 
-    public Taskmanager() {
+    public TaskManager() {
         this(new LinkedBlockingQueue<>());
     }
 
-    public @NotNull Collection<QueuedTask> viewQueue() {
+    @Contract(pure = true)
+    public @NotNull @UnmodifiableView Collection<QueuedTask> viewQueue() {
         return Collections.unmodifiableCollection(taskQueue);
     }
 
