@@ -30,6 +30,7 @@ public class LandfillServer implements Runnable, Closeable {
     public static final LandfillServer LANDFILL_SERVER = new LandfillServer();
     private @Nullable TaskManager taskmanager;
     private @Nullable DatabaseConnector databaseConnector;
+    private @Nullable DatabaseConnector backendDatabaseConnector;
     private Server server;
 
     public static @NotNull LandfillServer start() throws IllegalStateException{
@@ -45,8 +46,15 @@ public class LandfillServer implements Runnable, Closeable {
         logger.info("check completed successfully! Proceeding with boot...");
         System.setProperty("landfill.started", "1");
 
-        databaseConnector = new DatabaseConnector();
+        //Setup default database
+
+        databaseConnector = new DatabaseConnector(); //default data
         databaseConnector.setUp();
+
+        //Setup backend database
+
+        backendDatabaseConnector = new DatabaseConnector("backend");
+        backendDatabaseConnector.setUp();
 
         //Setup Security (BC - SSL)
         if(Security.getProvider("BC") == null) {
@@ -111,7 +119,11 @@ public class LandfillServer implements Runnable, Closeable {
         taskmanager.close();
 
         //shutdown hibernate
-        Objects.requireNonNull(databaseConnector, "Hibernate was never started or is no longer available!").getLandfillDB().close();
+        Objects.requireNonNull(databaseConnector, "Hibernate was never started or is no longer available!").getDatabase().close();
 
+    }
+
+    public @Nullable DatabaseConnector getBackendDatabaseConnector() {
+        return backendDatabaseConnector;
     }
 }

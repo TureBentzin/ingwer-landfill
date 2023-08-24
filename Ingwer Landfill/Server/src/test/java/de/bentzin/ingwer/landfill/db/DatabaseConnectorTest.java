@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
  */
 class DatabaseConnectorTest {
 
-    private static DatabaseConnector databaseConnector = new DatabaseConnector();
+    private static DatabaseConnector databaseConnector = new DatabaseConnector(); //default data
 
     @Test
     void setUp() {

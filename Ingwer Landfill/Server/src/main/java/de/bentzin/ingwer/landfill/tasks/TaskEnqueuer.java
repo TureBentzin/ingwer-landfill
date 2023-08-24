@@ -20,7 +20,7 @@ public class TaskEnqueuer {
         Objects.requireNonNull(LandfillServer
                         .LANDFILL_SERVER
                         .getTaskmanager())
-                .enqueue(new QueuedTask(task, context::channel, () -> Objects.requireNonNull(LandfillServer.LANDFILL_SERVER.getDatabaseConnector()).getLandfillDB().openSession()));
+                .enqueue(new QueuedTask(task, context::channel, () -> Objects.requireNonNull(LandfillServer.LANDFILL_SERVER.getDatabaseConnector()).getDatabase().openSession()));
 
     }
 }

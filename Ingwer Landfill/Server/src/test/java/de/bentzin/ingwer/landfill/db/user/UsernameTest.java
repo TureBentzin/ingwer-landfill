@@ -14,9 +14,9 @@ public class UsernameTest {
 
     @Test
     public void test() {
-        DatabaseConnector databaseConnector = new DatabaseConnector();
+        DatabaseConnector databaseConnector = new DatabaseConnector(); //default data
         databaseConnector.setUp();
-        try (Session session = databaseConnector.getLandfillDB().openSession()) {
+        try (Session session = databaseConnector.getDatabase().openSession()) {
             Transaction transaction = session.beginTransaction();
             //Account account = new Account(467730889640640523L, List.of(),"Bommels05", new Date(),"Bommels#0000",null,null);
             Account account = session.byId(Account.class).getReference(467730889640640523L);
