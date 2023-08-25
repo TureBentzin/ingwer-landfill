@@ -27,7 +27,6 @@ public final class PutConfirmResponsePacket extends ResponsePacket{
 
 
     public PutConfirmResponsePacket(PutPacket.@NotNull Datatype datatype, long packetChecksum, long jobID, boolean closedNow) {
-        super(ResponseType.PUT_CONFIRM);
         this.datatype = datatype;
         this.packetChecksum = packetChecksum;
         this.jobID = jobID;

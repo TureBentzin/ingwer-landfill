@@ -1,9 +1,12 @@
 package de.bentzin.ingwer.landfill.backend;
 
+import de.bentzin.ingwer.landfill.backend.priviliges.Privilege;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * {@link AuthorizedDumptruckOperator} is the landfill designation for a user that has privileges in within the landfill protocol
@@ -56,5 +59,16 @@ public class AuthorizedDumptruckOperator {
 
     public void setPublicKey(@NotNull String publicKey) {
         this.publicKey = publicKey;
+    }
+
+    @ManyToMany(mappedBy = "privileged")
+    private @NotNull Set<Privilege> privileges;
+
+    public @NotNull Set<Privilege> getPrivileges() {
+        return privileges;
+    }
+
+    public void setPrivileges(@NotNull Set<Privilege> privileges) {
+        this.privileges = privileges;
     }
 }

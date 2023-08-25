@@ -1,11 +1,12 @@
 package de.bentzin.ingwer.landfill.backend.priviliges;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import de.bentzin.ingwer.landfill.backend.AuthorizedDumptruckOperator;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ture Bentzin
@@ -16,8 +17,12 @@ import org.jetbrains.annotations.NotNull;
 public class Privilege {
 
     @Id
-    //@Pattern(regexp = "^[A-Z_]+$", message = "The identifier must be valid UPPER_SNAKE_CASE")
+    @Pattern(regexp = "^[A-Z_]+$", message = "The identifier must be valid UPPER_SNAKE_CASE")
     private @NotNull String identifier;
+
+    @ManyToMany()
+    private @NotNull List<AuthorizedDumptruckOperator> privileged = new ArrayList<>();
+
     private boolean enabled;
 
     public Privilege() {
@@ -50,5 +55,13 @@ public class Privilege {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public @NotNull List<AuthorizedDumptruckOperator> getPrivileged() {
+        return privileged;
+    }
+
+    public void setPrivileged(@NotNull List<AuthorizedDumptruckOperator> privileged) {
+        this.privileged = privileged;
     }
 }

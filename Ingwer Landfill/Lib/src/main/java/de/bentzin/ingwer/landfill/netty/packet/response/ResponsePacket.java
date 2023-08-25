@@ -24,7 +24,7 @@ public abstract sealed class ResponsePacket implements Packet permits MalformedD
     }
 
     protected ResponsePacket() {
-        this.responseType = findType().orElseThrow(() -> new NoSuchElementException(getClass().getSimpleName() + " seems to have no associated ResponseType!"))
+        this.responseType = findType().orElseThrow(() -> new NoSuchElementException(getClass().getSimpleName() + " seems to have no associated ResponseType!"));
     }
 
     protected ResponsePacket(@NotNull Buffer buffer) {

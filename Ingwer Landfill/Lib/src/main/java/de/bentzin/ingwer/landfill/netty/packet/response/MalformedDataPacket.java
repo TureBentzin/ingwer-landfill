@@ -16,7 +16,6 @@ public final class MalformedDataPacket extends ResponsePacket {
     private final @NotNull String execption;
 
     public MalformedDataPacket(@NotNull String execption) {
-        super(ResponseType.MALFORMED);
         this.execption = execption;
     }
 
