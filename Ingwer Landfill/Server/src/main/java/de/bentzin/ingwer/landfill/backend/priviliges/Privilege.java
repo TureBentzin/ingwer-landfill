@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class Privilege {
 
     @Id
-    @Pattern(regexp = "^[A-Z_]+$", message = "The identifier must be valid UPPER_SNAKE_CASE")
+    //@Pattern(regexp = "^[A-Z_]+$", message = "The identifier must be valid UPPER_SNAKE_CASE")
     private @NotNull String identifier;
     private boolean enabled;
 

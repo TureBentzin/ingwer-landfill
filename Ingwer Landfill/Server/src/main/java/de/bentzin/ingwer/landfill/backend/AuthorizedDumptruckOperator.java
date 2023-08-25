@@ -1,9 +1,6 @@
 package de.bentzin.ingwer.landfill.backend;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -13,17 +10,51 @@ import java.util.List;
  * @author Ture Bentzin
  * @since 2023-08-24
  */
-@Table
+@Table(name = "operator")
 @Entity
 public class AuthorizedDumptruckOperator {
 
+    public AuthorizedDumptruckOperator(@NotNull String designation, @NotNull List<WorkerID> workers, @NotNull String publicKey) {
+        this.designation = designation;
+        this.workers = workers;
+        this.publicKey = publicKey;
+    }
+
+    public AuthorizedDumptruckOperator() {
+    }
+
     @Id
+    @Column(length = 32, nullable = false)
     private @NotNull String designation;
 
-    @OneToMany
+    @OneToMany(mappedBy = "operator")
     private @NotNull List<WorkerID> workers;
 
-    private @NotNull String public_key;
+    @Column(nullable = false, unique = true)
+    private @NotNull String publicKey;
 
 
+    public @NotNull String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(@NotNull String designation) {
+        this.designation = designation;
+    }
+
+    public @NotNull List<WorkerID> getWorkers() {
+        return workers;
+    }
+
+    public void setWorkers(@NotNull List<WorkerID> workers) {
+        this.workers = workers;
+    }
+
+    public @NotNull String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(@NotNull String publicKey) {
+        this.publicKey = publicKey;
+    }
 }

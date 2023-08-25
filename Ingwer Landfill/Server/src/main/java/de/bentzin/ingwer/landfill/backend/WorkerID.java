@@ -2,6 +2,7 @@ package de.bentzin.ingwer.landfill.backend;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,8 +22,9 @@ public class WorkerID {
     public WorkerID() {
     }
 
-    public WorkerID(@NotNull UUID workerID) {
+    public WorkerID(@NotNull UUID workerID, @NotNull AuthorizedDumptruckOperator operator) {
         this.workerID = workerID;
+        this.operator = operator;
     }
 
     public @NotNull UUID getWorkerID() {
@@ -31,5 +33,16 @@ public class WorkerID {
 
     public void setWorkerID(@NotNull UUID workerID) {
         this.workerID = workerID;
+    }
+
+    @ManyToOne(optional = false)
+    private @NotNull AuthorizedDumptruckOperator operator;
+
+    public @NotNull AuthorizedDumptruckOperator getOperator() {
+        return operator;
+    }
+
+    public void setOperator(@NotNull AuthorizedDumptruckOperator operator) {
+        this.operator = operator;
     }
 }

@@ -17,17 +17,20 @@ import java.util.Optional;
  */
 public final class DatabaseConnector {
 
-    private static final @NotNull Logger logger = LogManager.getLogger();
+    private static final @NotNull Logger databaseConnectorLogger = LogManager.getLogger();
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final @NotNull Optional<String> instance;
+    private final Logger logger;
     protected @Nullable SessionFactory database;
 
     public DatabaseConnector() {
         this.instance = Optional.empty(); //Default landfill db (stores the actual data)
+        logger = databaseConnectorLogger;
     }
 
     public DatabaseConnector(@NotNull String instance) {
+        logger = LogManager.getLogger(databaseConnectorLogger.getName() + "." + instance);
         logger.info("created instance for: " + instance);
         this.instance = Optional.of(instance);
     }

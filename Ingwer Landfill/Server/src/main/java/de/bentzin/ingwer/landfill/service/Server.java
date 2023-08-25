@@ -2,6 +2,7 @@ package de.bentzin.ingwer.landfill.service;
 
 import de.bentzin.ingwer.landfill.Dummy;
 import de.bentzin.ingwer.landfill.OneWaySwitch;
+import de.bentzin.ingwer.landfill.backend.BackendHelper;
 import de.bentzin.ingwer.landfill.netty.NettyTransport;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.Packet;
@@ -73,7 +74,7 @@ public class Server {
                     .clientAuth(ClientAuth.REQUIRE)
                     .trustManager(FingerprintTrustManagerFactory
                             .builder("SHA-256")
-                            .fingerprints(Dummy.keys()).build())
+                            .fingerprints(BackendHelper.getAllPublicKeys()).build())
                     .build();
         } catch (SSLException e) {
             throw new RuntimeException(e);
