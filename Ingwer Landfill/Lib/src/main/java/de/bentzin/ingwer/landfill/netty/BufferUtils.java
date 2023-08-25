@@ -1,16 +1,15 @@
 package de.bentzin.ingwer.landfill.netty;
 
 import io.netty5.buffer.Buffer;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 /**
@@ -88,6 +87,82 @@ public final class BufferUtils {
 
     public static <T extends Enum<T>> void encodeEnum(@NotNull Buffer buffer, @NotNull T t) {
         buffer.writeInt(t.ordinal());
+    }
+
+    public static <T> void encodeCollection(@NotNull Buffer buffer, @NotNull Collection<@NotNull T> collection,
+                                            @NotNull BiConsumer<@NotNull Buffer, @NotNull T> encoder) {
+        encodeIterable(buffer, collection, encoder, Collection::size);
+    }
+
+    public static <T> @NotNull Collection<T> decodeCollection(@NotNull Buffer buffer, @NotNull Function<@NotNull Buffer,
+            @NotNull T> decoder) {
+        int size = buffer.readInt();
+        ArrayList<T> arrayList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            arrayList.add(decoder.apply(buffer));
+        }
+        return arrayList;
+    }
+
+    //Compatible with encodeIterable
+    public static <T> void encodeArray(@NotNull Buffer buffer, T @NotNull [] ts, @NotNull BiConsumer<@NotNull Buffer, @NotNull T> encoder) {
+        buffer.writeInt(ts.length);
+        for (T t : ts) {
+            encoder.accept(buffer, t);
+        }
+    }
+
+    /**
+     * Use {@link #decodeCollection(Buffer, Function)} and {@link Collection#toArray()} instead
+     * @param buffer buffer
+     * @param decoder decoder
+     * @return array containing the decoded Ts as Objects
+     * @param <T> Type
+     */
+    @Deprecated
+    public static <T> Object @NotNull [] decodeArray(@NotNull Buffer buffer,@NotNull Function<@NotNull Buffer, @NotNull T> decoder) {
+        Object[] objects = new Object[buffer.readInt()];
+        for (int i = 0; i < objects.length; i++) {
+            objects[i] = decoder.apply(buffer);
+        }
+        return objects;
+    }
+
+    @ApiStatus.Internal
+    public static <T, I extends Iterable<T>> void encodeIterable(@NotNull Buffer buffer, @NotNull I iterable, @NotNull BiConsumer<@NotNull Buffer, @NotNull T> encoder,
+                                                                 @NotNull Function<I, Integer> sizeMapper) {
+        buffer.writeInt(sizeMapper.apply(iterable));
+        for (T t : iterable) {
+            encoder.accept(buffer, t);
+        }
+    }
+
+
+    public static <K, V> void encodeMap(@NotNull Buffer buffer, @NotNull Map<K, V> map, @NotNull BiConsumer<@NotNull Buffer,
+            @NotNull K> kEncoder, @NotNull BiConsumer<@NotNull Buffer, @NotNull V> vEncoder) {
+        encodeCollection(buffer, map.entrySet(), (buffer1, entry) -> encodeEntry(buffer1, entry, kEncoder, vEncoder));
+    }
+
+    public static <K, V> @NotNull @Unmodifiable Map<K, V> decodeMap(@NotNull Buffer buffer,
+                                                                    @NotNull Function<@NotNull Buffer, @NotNull K> kDecoder,
+                                                                    @NotNull Function<@NotNull Buffer, @NotNull V> vDecoder) {
+        return decodeCollection(buffer, buffer1 -> decodeEntry(buffer1, kDecoder, vDecoder)).stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public static <K, V> void encodeEntry(@NotNull Buffer buffer, Map.@NotNull Entry<@NotNull K, @NotNull V> entry,
+                                          @NotNull BiConsumer<@NotNull Buffer, @NotNull K> kEncoder,
+                                          @NotNull BiConsumer<@NotNull Buffer, @NotNull V> vEncoder) {
+        kEncoder.accept(buffer, entry.getKey());
+        vEncoder.accept(buffer, entry.getValue());
+    }
+
+    @Contract("_, _, _ -> new")
+    public static <K, V> Map.@NotNull @Unmodifiable Entry<K, V> decodeEntry(@NotNull Buffer buffer, @NotNull Function<@NotNull Buffer, @NotNull K> kDecoder, @NotNull Function<@NotNull Buffer, @NotNull V> vDecoder) {
+        return Map.entry(
+                kDecoder.apply(buffer),
+                vDecoder.apply(buffer)
+        );
     }
 
     public static long calculateChecksum(Buffer buffer) {
