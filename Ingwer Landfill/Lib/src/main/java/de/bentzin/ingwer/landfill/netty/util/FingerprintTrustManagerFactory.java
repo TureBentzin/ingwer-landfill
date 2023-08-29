@@ -21,6 +21,8 @@ import io.netty5.buffer.BufferUtil;
 import io.netty5.util.concurrent.FastThreadLocal;
 import io.netty5.util.internal.EmptyArrays;
 import io.netty5.util.internal.StringUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.ManagerFactoryParameters;
@@ -101,6 +103,8 @@ public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFact
 
     private final @NotNull TrustManager tm = new X509TrustManager() {
 
+        private static final @NotNull Logger logger = LogManager.getLogger();
+
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String s) throws CertificateException {
             checkTrusted("client", chain);
@@ -118,6 +122,7 @@ public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFact
             for (byte[] allowedFingerprint: fingerprints) {
                 if (Arrays.equals(fingerprint, allowedFingerprint)) {
                     found = true;
+                    logger.info("Verified: " + new String(allowedFingerprint));
                     break;
                 }
             }
