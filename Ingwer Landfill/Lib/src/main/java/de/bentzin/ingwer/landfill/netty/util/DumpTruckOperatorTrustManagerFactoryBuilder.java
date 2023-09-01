@@ -8,10 +8,10 @@ import static io.netty5.util.internal.ObjectUtil.checkNotNullWithIAE;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A builder for creating {@link FingerprintTrustManagerFactory}.
+ * A builder for creating {@link DumpTruckOperatorTrustManagerFactory}.
  */
 @SuppressWarnings("NullabilityAnnotations")
-public final class FingerprintTrustManagerFactoryBuilder {
+public final class DumpTruckOperatorTrustManagerFactoryBuilder<T extends FingerprintHolder> {
 
     /**
      * A hash algorithm for fingerprints.
@@ -21,14 +21,14 @@ public final class FingerprintTrustManagerFactoryBuilder {
     /**
      * A list of fingerprints.
      */
-    private final List<String> fingerprints = new ArrayList<>();
+    private final List<T> fingerprints = new ArrayList<>();
 
     /**
      * Creates a builder.
      *
      * @param algorithm a hash algorithm
      */
-    FingerprintTrustManagerFactoryBuilder(String algorithm) {
+    DumpTruckOperatorTrustManagerFactoryBuilder(String algorithm) {
         this.algorithm = requireNonNull(algorithm, "algorithm");
     }
 
@@ -38,7 +38,7 @@ public final class FingerprintTrustManagerFactoryBuilder {
      * @param fingerprints a number of fingerprints
      * @return the same builder
      */
-    public FingerprintTrustManagerFactoryBuilder fingerprints(CharSequence... fingerprints) {
+    public DumpTruckOperatorTrustManagerFactoryBuilder<T> fingerprints(T... fingerprints) {
         return fingerprints(Arrays.asList(requireNonNull(fingerprints, "fingerprints")));
     }
 
@@ -48,25 +48,24 @@ public final class FingerprintTrustManagerFactoryBuilder {
      * @param fingerprints a number of fingerprints
      * @return the same builder
      */
-    public FingerprintTrustManagerFactoryBuilder fingerprints(Iterable<? extends CharSequence> fingerprints) {
+    public DumpTruckOperatorTrustManagerFactoryBuilder<T> fingerprints(Iterable<? extends T> fingerprints) {
         requireNonNull(fingerprints, "fingerprints");
-        for (CharSequence fingerprint : fingerprints) {
-            checkNotNullWithIAE(fingerprint, "fingerprint");
-            this.fingerprints.add(fingerprint.toString());
+        for (T fingerprint : fingerprints) {
+            checkNotNullWithIAE(fingerprint.humanReadableFingerprint(), "fingerprint");
+            this.fingerprints.add(fingerprint);
         }
         return this;
     }
 
     /**
-     * Creates a {@link FingerprintTrustManagerFactory}.
+     * Creates a {@link DumpTruckOperatorTrustManagerFactory}.
      *
-     * @return a new {@link FingerprintTrustManagerFactory}
+     * @return a new {@link DumpTruckOperatorTrustManagerFactory}
      */
-    public FingerprintTrustManagerFactory build() {
+    public DumpTruckOperatorTrustManagerFactory<T> build() {
         if (fingerprints.isEmpty()) {
             throw new IllegalStateException("No fingerprints provided");
         }
-        byte[][] fingerprints = FingerprintTrustManagerFactory.toFingerprintArray(this.fingerprints);
-        return new FingerprintTrustManagerFactory(algorithm, fingerprints);
+        return new DumpTruckOperatorTrustManagerFactory<T>(algorithm, fingerprints);
     }
 }

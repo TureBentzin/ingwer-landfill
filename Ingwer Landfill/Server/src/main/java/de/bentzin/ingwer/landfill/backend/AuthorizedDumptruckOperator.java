@@ -1,6 +1,7 @@
 package de.bentzin.ingwer.landfill.backend;
 
 import de.bentzin.ingwer.landfill.backend.priviliges.Privilege;
+import de.bentzin.ingwer.landfill.netty.util.FingerprintHolder;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +16,7 @@ import java.util.Set;
  */
 @Table(name = "operator")
 @Entity
-public class AuthorizedDumptruckOperator {
+public class AuthorizedDumptruckOperator implements FingerprintHolder {
 
     public AuthorizedDumptruckOperator(@NotNull String designation, @NotNull List<WorkerID> workers, @NotNull String publicKey) {
         this.designation = designation;
@@ -70,5 +71,15 @@ public class AuthorizedDumptruckOperator {
 
     public void setPrivileges(@NotNull Set<Privilege> privileges) {
         this.privileges = privileges;
+    }
+
+    @Override
+    public final @NotNull CharSequence humanReadableFingerprint() {
+        return getPublicKey();
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return designation;
     }
 }

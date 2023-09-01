@@ -84,8 +84,12 @@ public class Client {
         channel.flush();
 
         //test
-        channel.write(new PutAccountPacket(2103812381242342L, "USERNAME", "DISPLAYNAME", 9812347802134L,"LEGACYNAME#0000", "IT / TI", "I am a Test!", true));
+       /*
+               channel.write(new PutAccountPacket(2103812381242342L, "USERNAME", "DISPLAYNAME", 9812347802134L,"LEGACYNAME#0000", "IT / TI", "I am a Test!", true));
         channel.flush();
+
+        */
+
 
     }
 

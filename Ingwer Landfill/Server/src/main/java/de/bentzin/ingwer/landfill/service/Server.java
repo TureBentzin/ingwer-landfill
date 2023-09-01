@@ -1,13 +1,13 @@
 package de.bentzin.ingwer.landfill.service;
 
-import de.bentzin.ingwer.landfill.Dummy;
 import de.bentzin.ingwer.landfill.OneWaySwitch;
+import de.bentzin.ingwer.landfill.backend.AuthorizedDumptruckOperator;
 import de.bentzin.ingwer.landfill.backend.BackendHelper;
 import de.bentzin.ingwer.landfill.netty.NettyTransport;
 import de.bentzin.ingwer.landfill.netty.NettyUtils;
 import de.bentzin.ingwer.landfill.netty.Packet;
 import de.bentzin.ingwer.landfill.netty.PacketRegistry;
-import de.bentzin.ingwer.landfill.netty.util.FingerprintTrustManagerFactory;
+import de.bentzin.ingwer.landfill.netty.util.DumpTruckOperatorTrustManagerFactory;
 import io.netty5.bootstrap.ServerBootstrap;
 import io.netty5.channel.Channel;
 import io.netty5.channel.ChannelOption;
@@ -29,6 +29,7 @@ import javax.net.ssl.SSLException;
 import java.net.SocketAddress;
 import java.security.cert.CertificateException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Ture Bentzin
@@ -69,12 +70,17 @@ public class Server {
             throw new RuntimeException(e);
         }
         SslContext sslCtx;
+
+
+        final DumpTruckOperatorTrustManagerFactory<AuthorizedDumptruckOperator> trustManagerFactory
+                = DumpTruckOperatorTrustManagerFactory
+                .<AuthorizedDumptruckOperator>builder("SHA-256")
+                .fingerprints(BackendHelper.allAuthorizedOperators()).build();
+
         try {
             sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey())
                     .clientAuth(ClientAuth.REQUIRE)
-                    .trustManager(FingerprintTrustManagerFactory
-                            .builder("SHA-256")
-                            .fingerprints(BackendHelper.getAllPublicKeys()).build())
+                    .trustManager(trustManagerFactory)
                     .build();
         } catch (SSLException e) {
             throw new RuntimeException(e);
@@ -91,6 +97,14 @@ public class Server {
                 .channel(NettyTransport.BEST.serverSocketChannelClazz)
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childHandler(new ServerInit(sslCtx, PACKET_REGISTRY, channels));
+
+        //Packets are not available at this point
+        try {
+            logger.info("Access to logon from: " + trustManagerFactory.getContainer().get());
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Logon extraction failed: " + trustManagerFactory.getContainer());
+            throw new RuntimeException(e);
+        }
 
         logger.info("protocol supports the following packets:");
         for (Map.Entry<Integer, Class<? extends Packet>> integerClassEntry : PACKET_REGISTRY.getPackets().entrySet()) {

@@ -27,14 +27,34 @@ public class BackendHelper {
     /**
      * @return the public keys or an empty Set
      */
+    @Deprecated
     public static @Unmodifiable @NotNull Set<CharSequence> getAllPublicKeys() {
         return getAllPublicKeys(LandfillServer.LANDFILL_SERVER);
+    }
+
+    public static @Unmodifiable @NotNull Set<AuthorizedDumptruckOperator> allAuthorizedOperators() {
+        return allAuthorizedOperators(LandfillServer.LANDFILL_SERVER);
+    }
+
+    public static @Unmodifiable @NotNull Set<AuthorizedDumptruckOperator> allAuthorizedOperators(@NotNull LandfillServer landfillServer) {
+        Session session = landfillServer.getBackendDatabaseConnector().getDatabase().openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            Query<AuthorizedDumptruckOperator> fromUser = session.createQuery("FROM AuthorizedDumptruckOperator"); //bad code - hard reference to AuthorizedDumptruckOperator
+            List<AuthorizedDumptruckOperator> list = fromUser.getResultList();
+            return Set.copyOf(list);
+        }catch (ClassCastException e) {
+            logger.error("HQL ERROR: " + e);
+            logger.throwing(e);
+        }
+        return Set.of();
     }
 
     /**
      * @param landfillServer the server
      * @return the public keys or an empty Set
      */
+    @Deprecated
     public static @Unmodifiable @NotNull Set<CharSequence> getAllPublicKeys(@NotNull LandfillServer landfillServer) {
         Session session = landfillServer.getBackendDatabaseConnector().getDatabase().openSession();
         Transaction transaction = session.beginTransaction();

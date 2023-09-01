@@ -23,6 +23,7 @@ import io.netty5.util.internal.EmptyArrays;
 import io.netty5.util.internal.StringUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.ManagerFactoryParameters;
@@ -38,9 +39,11 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
+import static de.bentzin.ingwer.landfill.netty.util.FingerprintHolder.mapFingerprints;
 
 /**
  * An {@link TrustManagerFactory} that trusts an X.509 certificate whose hash matches.
@@ -84,19 +87,26 @@ import static java.util.Objects.requireNonNull;
  * </p>
  */
 @SuppressWarnings("NullabilityAnnotations")
-public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFactory {
+public final class DumpTruckOperatorTrustManagerFactory<T extends FingerprintHolder> extends SimpleTrustManagerFactory {
 
     private static final Pattern FINGERPRINT_PATTERN = Pattern.compile("^[0-9a-fA-F:]+$");
     private static final Pattern FINGERPRINT_STRIP_PATTERN = Pattern.compile(":");
 
+    protected CompletableFuture<T> container = new CompletableFuture<>();
+
+    public CompletableFuture<T> getContainer() {
+        return container;
+    }
+
     /**
-     * Creates a builder for {@link FingerprintTrustManagerFactory}.
+     * Creates a builder for {@link DumpTruckOperatorTrustManagerFactory}.
      *
      * @param algorithm a hash algorithm
      * @return a builder
      */
-    public static FingerprintTrustManagerFactoryBuilder builder(String algorithm) {
-        return new FingerprintTrustManagerFactoryBuilder(algorithm);
+    @Contract("_ -> new")
+    public static <T extends FingerprintHolder> @NotNull DumpTruckOperatorTrustManagerFactoryBuilder<T> builder(String algorithm) {
+        return new DumpTruckOperatorTrustManagerFactoryBuilder<T>(algorithm);
     }
 
     private final FastThreadLocal<MessageDigest> tlmd;
@@ -115,21 +125,26 @@ public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFact
             checkTrusted("server", chain);
         }
 
-        private void checkTrusted(String type, X509Certificate[] chain) throws CertificateException {
-            X509Certificate cert = chain[0];
+        private void checkTrusted(String type, X509Certificate @NotNull [] chain) throws CertificateException {
+            X509Certificate cert = chain[0]; //no idea..??
             byte[] fingerprint = fingerprint(cert);
+            container = new CompletableFuture<>(); //clear previous result
             boolean found = false;
-            for (byte[] allowedFingerprint: fingerprints) {
-                if (Arrays.equals(fingerprint, allowedFingerprint)) {
+            for (T allowedFingerprint: fingerprints) {
+                if (Arrays.equals(fingerprint, allowedFingerprint.fingerprint())) {
                     found = true;
-                    logger.info("Verified: " + new String(allowedFingerprint));
+                    container.complete(allowedFingerprint);
+                    logger.info("Verified: " + allowedFingerprint);
                     break;
                 }
             }
 
             if (!found) {
-                throw new CertificateException(
+                CertificateException certificateException = new CertificateException(
+                        "[Authorization was not possible]: " +
                         type + " certificate with unknown fingerprint: " + cert.getSubjectDN());
+                container.completeExceptionally(certificateException);
+                throw certificateException;
             }
         }
 
@@ -145,7 +160,8 @@ public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFact
         }
     };
 
-    private final byte[][] fingerprints;
+    // private final byte[][] fingerprints;
+    private final List<T> fingerprints;
 
     /**
      * Creates a new instance.
@@ -153,11 +169,11 @@ public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFact
      * @param algorithm a hash algorithm
      * @param fingerprints a list of fingerprints
      */
-    FingerprintTrustManagerFactory(final String algorithm, byte[][] fingerprints) {
+    DumpTruckOperatorTrustManagerFactory(final String algorithm, List<T> fingerprints) {
         requireNonNull(algorithm, "algorithm");
         requireNonNull(fingerprints, "fingerprints");
 
-        if (fingerprints.length == 0) {
+        if (fingerprints.size() == 0) {
             throw new IllegalArgumentException("No fingerprints provided");
         }
 
@@ -171,8 +187,9 @@ public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFact
         }
 
         int hashLength = md.getDigestLength();
-        List<byte[]> list = new ArrayList<>(fingerprints.length);
-        for (byte[] f: fingerprints) {
+        List<T> list = new ArrayList<>(fingerprints.size());
+        for (T t: fingerprints) {
+            byte[] f = t.fingerprint();
             if (f == null) {
                 break;
             }
@@ -181,7 +198,7 @@ public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFact
                         String.format("malformed fingerprint (length is %d but expected %d): %s",
                                       f.length, hashLength, BufferUtil.hexDump(f)));
             }
-            list.add(f.clone());
+            list.add(t); //was clone - removed because of laziness. I hope that does not fire back
         }
 
         tlmd = new FastThreadLocal<>() {
@@ -197,27 +214,30 @@ public final class FingerprintTrustManagerFactory extends SimpleTrustManagerFact
             }
         };
 
-        this.fingerprints = list.toArray(EmptyArrays.EMPTY_BYTES_BYTES);
+        this.fingerprints = list;
     }
 
-    static byte[][] toFingerprintArray(Iterable<String> fingerprints) {
+    static byte[] @NotNull [] toFingerprintArray(Iterable<String> fingerprints) {
         requireNonNull(fingerprints, "fingerprints");
 
         List<byte[]> list = new ArrayList<>();
         for (String f: fingerprints) {
-            if (f == null) {
-                break;
-            }
-
-            if (!FINGERPRINT_PATTERN.matcher(f).matches()) {
-                throw new IllegalArgumentException("malformed fingerprint: " + f);
-            }
-            f = FINGERPRINT_STRIP_PATTERN.matcher(f).replaceAll("");
-
-            list.add(StringUtil.decodeHexDump(f));
+            list.add(toFingerprint(f));
         }
 
         return list.toArray(EmptyArrays.EMPTY_BYTES_BYTES);
+    }
+
+    public static byte[] toFingerprint(CharSequence f) {
+        if (f == null) {
+            return new byte[0];
+        }
+
+        if (!FINGERPRINT_PATTERN.matcher(f).matches()) {
+            throw new IllegalArgumentException("malformed fingerprint: " + f);
+        }
+        f = FINGERPRINT_STRIP_PATTERN.matcher(f).replaceAll("");
+        return StringUtil.decodeHexDump(f);
     }
 
     @Override
