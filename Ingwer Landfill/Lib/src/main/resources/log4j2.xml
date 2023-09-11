@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" name="ingwer-landfill">
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss};%sn [%M@%c{1}] %highlight{%-5level} - %msg%n" />
+        </Console>
+        <RollingFile name="FileLogs" filePattern="logs/log-%d{yyyy-MM-dd-HH}-%i.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] [%-5level] - %logger{36} - %msg%n" />
+            <Append>false</Append>
+            <Policies>
+               <!--- <TimeBasedTriggeringPolicy interval="6" modulate="true" /> -->
+               <!-- <SizeBasedTriggeringPolicy size="250 MB"/> -->
+                <OnStartupTriggeringPolicy />
+                <!-- <DefaultRolloverStrategy max="20"/> -->
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="ConsoleAppender" />
+            <AppenderRef ref="FileLogs"/>
+        </Root>
+    </Loggers>
+</Configuration>
